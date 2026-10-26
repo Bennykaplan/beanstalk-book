@@ -4,9 +4,9 @@ import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
 const FONT = require.resolve('@fontsource/fredoka/files/fredoka-latin-600-normal.woff');
 
-// 11 x 8.25 in landscape, matching the 4:3 art.
+// 11 x 7.33 in landscape, matching the 3:2 (1536x1024) art.
 const W = 792;
-const H = 594;
+const H = 528;
 
 const toBuffer = (dataUrl) => Buffer.from(dataUrl.split(',')[1], 'base64');
 
@@ -34,11 +34,11 @@ function drawStoryText(doc, text, area) {
 
 function drawAboutMe(doc, about, character) {
   doc.rect(0, 0, W, H).fill('#fbf6e9');
-  if (character) doc.image(toBuffer(character), 40, 70, { fit: [360, 460], align: 'center', valign: 'center' });
+  if (character) doc.image(toBuffer(character), 40, 64, { fit: [360, 400], align: 'center', valign: 'center' });
   const x = 430;
   const w = W - x - 50;
-  doc.font(FONT).fillColor('#3f8a3a').fontSize(22).text('About Me', x, 90, { width: w });
-  doc.fillColor('#23311f').fontSize(40).text(about.name || 'Jack', x, 122, { width: w });
+  doc.font(FONT).fillColor('#3f8a3a').fontSize(22).text('About Me', x, 70, { width: w });
+  doc.fillColor('#23311f').fontSize(40).text(about.name || 'Jack', x, 100, { width: w });
   let y = doc.y + 18;
   for (const [label, value] of [['Age', about.age], ['Favorite things', about.favorites], ['About me', about.bio]]) {
     if (!value) continue;

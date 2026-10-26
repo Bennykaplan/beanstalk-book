@@ -8,12 +8,13 @@ import { buildBook } from './pdf.js';
 const DIR = path.dirname(fileURLToPath(import.meta.url));
 try { process.loadEnvFile(path.join(DIR, '.env')); } catch { /* no .env file */ }
 
-const API_KEY = process.env.GEMINI_API_KEY;
-const MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash-image';
+const API_KEY = process.env.OPENAI_API_KEY;
+const MODEL = process.env.OPENAI_IMAGE_MODEL || 'gpt-image-1.5';
+const QUALITY = process.env.OPENAI_IMAGE_QUALITY || 'medium';
 const RATE_LIMIT_PER_HOUR = Number(process.env.RATE_LIMIT_PER_HOUR || 30);
 const PORT = process.env.PORT || 3020;
 
-if (!API_KEY) console.warn('GEMINI_API_KEY is not set; generation requests will fail.');
+if (!API_KEY) console.warn('OPENAI_API_KEY is not set; generation requests will fail.');
 
 const BOOK = PAGES.filter((p) => p.enabled);
 
@@ -47,29 +48,32 @@ function parseDataUrl(dataUrl) {
   return { mime_type: m[1], data: m[2] };
 }
 
-// Exactly one request per user action: no retries, no loops.
+// Every call goes through OpenAI's image edit endpoint, because every call starts from a
+// reference image (the photo, or Jack's character sheet). Exactly one request per user
+// action: no retries, no loops.
 async function generateImage(prompt, images) {
-  const r = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-goog-api-key': API_KEY },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }, ...images.map((img) => ({ inline_data: img }))] }],
-        generationConfig: { responseModalities: ['IMAGE'], imageConfig: { aspectRatio: '4:3' } },
-      }),
-    },
-  );
+  const form = new FormData();
+  form.append('model', MODEL);
+  form.append('prompt', prompt);
+  form.append('size', '1536x1024');
+  form.append('quality', QUALITY);
+  form.append('output_format', 'jpeg');
+  form.append('output_compression', '90');
+  form.append('input_fidelity', process.env.OPENAI_INPUT_FIDELITY || 'high'); // keeps the reference face
+  images.forEach((img, i) => {
+    const ext = img.mime_type.split('/')[1];
+    form.append('image[]', new Blob([Buffer.from(img.data, 'base64')], { type: img.mime_type }), `ref${i}.${ext}`);
+  });
+  const r = await fetch('https://api.openai.com/v1/images/edits', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${API_KEY}` },
+    body: form,
+  });
   const body = await r.json().catch(() => ({}));
-  if (!r.ok) throw new Error(body.error?.message || `Gemini returned HTTP ${r.status}`);
-  const parts = body.candidates?.[0]?.content?.parts || [];
-  const img = parts.find((p) => p.inlineData || p.inline_data);
-  if (!img) {
-    const why = parts.find((p) => p.text)?.text || body.candidates?.[0]?.finishReason || 'no image returned';
-    throw new Error(`The model did not return an image (${why}).`);
-  }
-  const { mimeType, mime_type, data } = img.inlineData || img.inline_data;
-  return `data:${mimeType || mime_type};base64,${data}`;
+  if (!r.ok) throw new Error(body.error?.message || `OpenAI returned HTTP ${r.status}`);
+  const b64 = body.data?.[0]?.b64_json;
+  if (!b64) throw new Error('The model did not return an image.');
+  return `data:image/jpeg;base64,${b64}`;
 }
 
 const handle = (fn) => async (req, res) => {

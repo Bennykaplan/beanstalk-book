@@ -19,13 +19,13 @@ async function post(url, body) {
 const save = (file, dataUrl) => fs.writeFileSync(path.join(out, file), Buffer.from(dataUrl.split(',')[1], 'base64'));
 
 const character = await post('/api/character', { photo });
-save('0-character.png', character);
+save('0-character.jpg', character);
 const cupboard = await post('/api/page', { page: 'cupboard', character });
-save('1-cupboard.png', cupboard);
+save('1-cupboard.jpg', cupboard);
 const trade = await post('/api/page', { page: 'trade', character });
-save('2-trade.png', trade);
+save('2-trade.jpg', trade);
 const window = await post('/api/page', { page: 'window', character });
-save('3-window.png', window);
+save('3-window.jpg', window);
 
 const pdf = await post('/api/pdf', {
   images: { cupboard, trade, window },

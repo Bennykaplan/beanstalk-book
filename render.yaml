@@ -7,9 +7,9 @@ services:
     startCommand: npm start
     healthCheckPath: /healthz
     envVars:
-      - key: GEMINI_API_KEY
+      - key: OPENAI_API_KEY
         sync: false # set the value in the Render dashboard, never in the repo
-      - key: GEMINI_MODEL
-        value: gemini-2.5-flash-image
+      - key: OPENAI_IMAGE_MODEL
+        value: gpt-image-1.5
       - key: RATE_LIMIT_PER_HOUR
         value: "30"
