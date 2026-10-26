@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Beanstalk Storybook</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📖</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f6f3ea; --card: #fffdf7; --ink: #23311f; --muted: #66705f;
+    --accent: #3f8a3a; --accent-ink: #fff; --line: #ddd6c4; --err: #b3261e;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #141a13; --card: #1d251b; --ink: #e9eedf; --muted: #a2ad98; --accent: #6cbf5f; --accent-ink: #0d140c; --line: #33402f; --err: #ff8a80; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 1100px; margin: 0 auto; padding: 24px 16px 64px; }
+  h1 { font: 600 2rem Fredoka, system-ui, sans-serif; margin: 0 0 4px; }
+  .sub { color: var(--muted); margin: 0 0 24px; }
+  .step { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 20px; margin-bottom: 20px; }
+  .step h2 { margin: 0 0 12px; font-size: 1.15rem; }
+  .row { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; align-items: start; }
+  .fields { display: grid; gap: 10px; }
+  label { display: grid; gap: 4px; font-size: .9rem; color: var(--muted); }
+  input[type=text], textarea { font: inherit; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); width: 100%; }
+  textarea { resize: vertical; min-height: 64px; }
+  button { font: inherit; font-weight: 600; padding: 10px 18px; border-radius: 10px; border: 0; background: var(--accent); color: var(--accent-ink); cursor: pointer; }
+  button:disabled { opacity: .45; cursor: not-allowed; }
+  button.ghost { background: transparent; color: var(--accent); border: 1px solid var(--accent); padding: 8px 12px; }
+  .drop { border: 2px dashed var(--line); border-radius: 12px; padding: 24px; text-align: center; cursor: pointer; color: var(--muted); }
+  .drop:hover { border-color: var(--accent); }
+  .frame { position: relative; aspect-ratio: 4 / 3; background: var(--bg); border: 1px solid var(--line); border-radius: 12px; display: grid; place-items: center; overflow: hidden; color: var(--muted); font-size: .9rem; text-align: center; }
+  .frame.photo { aspect-ratio: 1; }
+  .frame img { width: 100%; height: 100%; object-fit: cover; }
+  .frame.photo img, #charFrame img { object-fit: contain; }
+  /* Same text treatment as the PDF layer, so the preview matches the download. */
+  .story { position: absolute; left: 0; right: 0; padding: 6% 8%; font: 600 clamp(14px, 2.4vw, 24px)/1.25 Fredoka, system-ui, sans-serif; color: #fff; text-shadow: 0 2px 3px rgba(0,0,0,.45); text-align: center; pointer-events: none; }
+  .story.bottom { bottom: 0; background: linear-gradient(transparent, rgba(0,0,0,.55)); }
+  .story.top { top: 0; background: linear-gradient(rgba(0,0,0,.55), transparent); }
+  .page h3 { margin: 0 0 10px; font-size: 1rem; }
+  .actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; align-items: center; }
+  .edit { display: flex; gap: 8px; margin-top: 8px; }
+  .edit input { flex: 1; }
+  .err { color: var(--err); font-size: .9rem; min-height: 1.2em; margin-top: 6px; }
+  .spin { width: 28px; height: 28px; border: 3px solid var(--line); border-top-color: var(--accent); border-radius: 50%; animation: s 1s linear infinite; margin: 0 auto 8px; }
+  @keyframes s { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+<main>
+  <h1>📖 Beanstalk Storybook</h1>
+  <p class="sub">Upload a child's photo and they become Jack in their own <em>Jack and the Beanstalk</em> book. Download it as a PDF.</p>
+
+  <section class="step">
+    <h2>1. The child</h2>
+    <div class="row">
+      <div>
+        <div class="drop" id="drop">Click or drop a photo here<br><small>A clear, front-facing photo works best. JPEG / PNG / WebP.</small></div>
+        <input type="file" id="file" accept="image/jpeg,image/png,image/webp" hidden>
+        <div class="fields" style="margin-top:14px">
+          <label>Child's name <input type="text" id="name" maxlength="40" placeholder="e.g. Sam"></label>
+          <label>Age <input type="text" id="age" maxlength="20" placeholder="e.g. 7"></label>
+          <label>Favorite things <input type="text" id="favorites" maxlength="200" placeholder="e.g. dinosaurs, pancakes, the color green"></label>
+          <label>About me <textarea id="bio" maxlength="500" placeholder="Anything you'd like on the About Me page"></textarea></label>
+        </div>
+      </div>
+      <div class="frame photo" id="photoFrame">No photo yet</div>
+    </div>
+  </section>
+
+  <section class="step">
+    <h2>2. Meet Jack</h2>
+    <div class="row">
+      <div>
+        <button id="charBtn" disabled>Create Jack</button>
+        <p class="sub" style="margin-top:10px">This character sheet is the one reference image used for every page, so Jack looks the same throughout the book. Make a new one if you don't like it, then re-make the pages.</p>
+        <div class="err" id="charErr"></div>
+      </div>
+      <div class="frame" id="charFrame">Jack's character sheet appears here</div>
+    </div>
+  </section>
+
+  <section class="step">
+    <h2>3. The pages</h2>
+    <div class="row" id="pages"></div>
+  </section>
+
+  <section class="step">
+    <h2>4. Your book</h2>
+    <button id="pdfBtn" disabled>Download JackAndTheBeanstalk.pdf</button>
+    <p class="sub" style="margin-top:10px" id="pdfHint">Make every page first. The last page is About Me, using the details from step 1.</p>
+    <div class="err" id="pdfErr"></div>
+  </section>
+</main>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const state = { photo: null, character: null, pages: [], images: {} };
+const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+// Downscale on the client so uploads stay small and cheap.
+function loadPhoto(file) {
+  if (!file || !/^image\/(jpeg|png|webp)$/.test(file.type)) return alert('Please choose a JPEG, PNG or WebP image.');
+  const img = new Image();
+  img.onload = () => {
+    const scale = Math.min(1, 1024 / Math.max(img.width, img.height));
+    const c = document.createElement('canvas');
+    c.width = Math.round(img.width * scale); c.height = Math.round(img.height * scale);
+    c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+    state.photo = c.toDataURL('image/jpeg', 0.9);
+    state.character = null; state.images = {};
+    $('photoFrame').innerHTML = `<img alt="Uploaded photo" src="${state.photo}">`;
+    $('charFrame').textContent = "Jack's character sheet appears here";
+    $('charBtn').disabled = false;
+    renderPages();
+    URL.revokeObjectURL(img.src);
+  };
+  img.src = URL.createObjectURL(file);
+}
+$('drop').onclick = () => $('file').click();
+$('file').onchange = (e) => loadPhoto(e.target.files[0]);
+$('drop').ondragover = (e) => e.preventDefault();
+$('drop').ondrop = (e) => { e.preventDefault(); loadPhoto(e.dataTransfer.files[0]); };
+
+async function post(url, body) {
+  const r = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  const j = await r.json().catch(() => ({ error: `Server error ${r.status}` }));
+  if (!r.ok) throw new Error(j.error || `Server error ${r.status}`);
+  return j;
+}
+const loading = (msg) => `<div><div class="spin"></div>${msg}</div>`;
+
+$('charBtn').onclick = async () => {
+  $('charBtn').disabled = true; $('charErr').textContent = '';
+  $('charFrame').innerHTML = loading('Drawing Jack…');
+  try {
+    const { image } = await post('/api/character', { photo: state.photo });
+    state.character = image; state.images = {};
+    $('charFrame').innerHTML = `<img alt="Jack character sheet" src="${image}">`;
+  } catch (e) {
+    $('charFrame').textContent = 'No character sheet yet';
+    $('charErr').textContent = e.message;
+  }
+  $('charBtn').disabled = false;
+  renderPages();
+};
+
+function renderPages() {
+  $('pages').innerHTML = state.pages.map((p) => `
+    <figure class="page" style="margin:0">
+      <h3>Page ${p.number}: ${esc(p.title)}</h3>
+      <div class="frame" id="frame-${p.id}">${state.images[p.id]
+        ? `<img alt="${esc(p.title)}" src="${state.images[p.id]}"><div class="story ${p.textArea}">${esc(p.text)}</div>`
+        : 'Not made yet'}</div>
+      <div class="actions"><button id="gen-${p.id}" ${state.character ? '' : 'disabled'}>${state.images[p.id] ? 'Re-make page' : 'Make page'}</button></div>
+      <div class="edit" ${state.images[p.id] ? '' : 'hidden'}>
+        <input type="text" id="edit-${p.id}" maxlength="300" placeholder="Change one thing, e.g. make the mother's dress green">
+        <button class="ghost" id="editBtn-${p.id}">Edit</button>
+      </div>
+      <div class="err" id="err-${p.id}"></div>
+    </figure>`).join('');
+  for (const p of state.pages) {
+    $(`gen-${p.id}`).onclick = () => makePage(p);
+    const eb = $(`editBtn-${p.id}`);
+    if (eb) eb.onclick = () => editPage(p);
+  }
+  const ready = state.pages.length && state.pages.every((p) => state.images[p.id]);
+  $('pdfBtn').disabled = !ready;
+}
+
+async function run(p, label, call) {
+  const btn = $(`gen-${p.id}`);
+  btn.disabled = true; $(`err-${p.id}`).textContent = '';
+  const old = $(`frame-${p.id}`).innerHTML;
+  $(`frame-${p.id}`).innerHTML = loading(label);
+  try {
+    state.images[p.id] = (await call()).image;
+    renderPages();
+  } catch (e) {
+    $(`frame-${p.id}`).innerHTML = old;
+    $(`err-${p.id}`).textContent = e.message;
+    btn.disabled = false;
+  }
+}
+const makePage = (p) => run(p, 'Painting the page…', () => post('/api/page', { page: p.id, character: state.character }));
+function editPage(p) {
+  const instruction = $(`edit-${p.id}`).value.trim();
+  if (!instruction) return ($(`err-${p.id}`).textContent = 'Describe what to change.');
+  run(p, 'Editing the page…', () => post('/api/edit', { image: state.images[p.id], character: state.character, instruction }));
+}
+
+$('pdfBtn').onclick = async () => {
+  $('pdfBtn').disabled = true; $('pdfErr').textContent = '';
+  try {
+    const about = { name: $('name').value, age: $('age').value, favorites: $('favorites').value, bio: $('bio').value };
+    const r = await fetch('/api/pdf', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ images: state.images, character: state.character, about }) });
+    if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error || `Server error ${r.status}`);
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(await r.blob()); a.download = 'JackAndTheBeanstalk.pdf'; a.click();
+  } catch (e) {
+    $('pdfErr').textContent = e.message;
+  }
+  $('pdfBtn').disabled = false;
+};
+
+fetch('/api/book').then((r) => r.json()).then((pages) => { state.pages = pages; renderPages(); });
+</script>
+</body>
+</html>

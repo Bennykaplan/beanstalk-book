@@ -1,0 +1,18 @@
+{
+  "name": "beanstalk-book",
+  "version": "1.0.0",
+  "description": "Upload a child photo, get a Jack and the Beanstalk picture-book PDF starring them.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "type": "module",
+  "dependencies": {
+    "@fontsource/fredoka": "^5.3.0",
+    "express": "^4.22.3",
+    "pdfkit": "^0.20.2"
+  },
+  "engines": {
+    "node": ">=20.12"
+  }
+}
