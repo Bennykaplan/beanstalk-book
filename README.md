@@ -4,6 +4,8 @@ Upload a child's photo and get a *Jack and the Beanstalk* picture book starring 
 
 **Live:** https://book.everchargeelectric.com · **Sample book:** [samples/JackAndTheBeanstalk.pdf](samples/JackAndTheBeanstalk.pdf) · **What's left:** [to-do.md](to-do.md)
 
+Sign in with Google, make a book, and it's still there when you come back.
+
 ## How it works
 
 All image calls use OpenAI's **image edit endpoint** (`/v1/images/edits`, model `gpt-image-1.5`, `input_fidelity: high`), because every picture starts from a reference image.
@@ -11,7 +13,8 @@ All image calls use OpenAI's **image edit endpoint** (`/v1/images/edits`, model 
 1. **Character sheet.** The photo becomes one reference image of the child as Jack (front and three-quarter views). That one image, plus one style string, goes into every page call, so Jack looks the same on every page.
 2. **Pages.** Each page is one image call: the style string, the fixed cast descriptions (mother, Milky-White, the old man), the scene, and a framing line that keeps the text area of the art empty.
 3. **Edit.** "Change one thing" sends the existing page (plus the character sheet) back to the edit endpoint with an instruction, instead of regenerating the page.
-4. **PDF.** `pdf.js` lays each page out full-bleed and draws the story text on top in Fredoka over a soft gradient. The image model never draws text. The last page is About Me, built from what the uploader typed.
+4. **Parallel with progress.** The character sheet is made first, then every page at once. Each image has its own progress bar, and the page polls the server for real status.
+5. **PDF.** `pdf.js` lays each page out full-bleed and draws the story text on top in Fredoka over a soft gradient. The image model never draws text. The last page is About Me, built from what the uploader typed.
 
 | File | What's in it |
 | --- | --- |
@@ -19,7 +22,14 @@ All image calls use OpenAI's **image edit endpoint** (`/v1/images/edits`, model 
 | `server.js` | Express API: `/api/character`, `/api/page`, `/api/edit`, `/api/pdf`. One model call per request, no retries or loops. |
 | `pdf.js` | PDF layout (pdfkit). |
 | `public/index.html` | The app. |
-| `test.mjs` | Makes a whole book for one photo against a running server, for prompt testing. |
+| `test.mjs` | End-to-end test against a local server with fake images: login, parallel pages, retry, edit, PDF, delete, and that another user can't reach the book. |
+
+| `auth.js` | Sign in with Google (OAuth 2.0 / OpenID Connect) and signed session cookies. |
+| `db.js` | Postgres: users, books, images and a log of every image call. Local runs use PGlite. |
+| `images.js` | The OpenAI call, the limit on parallel calls, and a free mock provider for testing. |
+| `log.js` | JSON logs to stdout: requests, logins and every image with its duration and outcome. No photos, keys or emails. |
+
+The photo is sent to OpenAI once to draw the character sheet and is never stored here. Every book lookup checks ownership, so one user can't reach another user's book. Users can delete a book, which removes its images.
 
 The style string is exactly: `Modern 3D animated feature — rounded forms, large expressive eyes, soft rim light.`
 
@@ -43,4 +53,6 @@ cp .env.example .env   # then put your OPENAI_API_KEY in .env
 npm start              # http://localhost:3020
 ```
 
-`.env` is in `.gitignore`. The key is never committed. On Render it's set in the service's Environment settings.
+For free local testing add `IMAGE_PROVIDER=mock` and `DEV_LOGIN=1` to `.env`, then run `node test.mjs <photo>`. For a real but cheap run, use `OPENAI_IMAGE_QUALITY=low`.
+
+`.env` is in `.gitignore`. The key is never committed. On Render it's set in the service's Environment settings, along with `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `SESSION_SECRET` and `DATABASE_URL`.

@@ -3,3 +3,5 @@ node_modules/
 test-output/
 test-photos/
 test-output-gemini/
+.localdb*/
+feedback-private/

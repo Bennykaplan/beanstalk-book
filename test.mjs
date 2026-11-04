@@ -1,36 +1,77 @@
-// Usage: node test.mjs <photo> <name> [age]
-// Makes one book against the running server (BASE, default localhost): one character call,
-// one call per page, then the PDF. Outputs land in test-output/<photo name>/.
+// End-to-end check against a running local server with DEV_LOGIN=1 and IMAGE_PROVIDER=mock
+// (costs nothing). Usage: node test.mjs <photo>
+import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 
-const [photoPath, name = 'Jack', age = ''] = process.argv.slice(2);
 const base = process.env.BASE || `http://localhost:${process.env.PORT || 3020}`;
-const out = path.join('test-output', path.parse(photoPath).name);
+const photoPath = process.argv[2];
 const ext = path.extname(photoPath).slice(1).replace('jpg', 'jpeg');
 const photo = `data:image/${ext};base64,${fs.readFileSync(photoPath).toString('base64')}`;
-fs.mkdirSync(out, { recursive: true });
 
-async function post(url, body) {
-  const r = await fetch(base + url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-  if (!r.ok) throw new Error((await r.json()).error);
-  return url === '/api/pdf' ? Buffer.from(await r.arrayBuffer()) : (await r.json()).image;
+async function client(who) {
+  const r = await fetch(`${base}/auth/dev`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ who }) });
+  assert.equal(r.status, 200, 'dev login');
+  const cookie = r.headers.get('set-cookie').split(';')[0];
+  return (url, method = 'GET', body) => fetch(base + url, {
+    method,
+    headers: { cookie, ...(body ? { 'Content-Type': 'application/json' } : {}) },
+    body: body && JSON.stringify(body),
+  });
 }
-const save = (file, dataUrl) => fs.writeFileSync(path.join(out, file), Buffer.from(dataUrl.split(',')[1], 'base64'));
 
-const character = await post('/api/character', { photo });
-save('0-character.jpg', character);
-const cupboard = await post('/api/page', { page: 'cupboard', character });
-save('1-cupboard.jpg', cupboard);
-const trade = await post('/api/page', { page: 'trade', character });
-save('2-trade.jpg', trade);
-const window = await post('/api/page', { page: 'window', character });
-save('3-window.jpg', window);
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-const pdf = await post('/api/pdf', {
-  images: { cupboard, trade, window },
-  character,
-  about: { name, age, favorites: 'Climbing trees, pancakes, and the color green', bio: `${name} loves stories about giants and wants to be an explorer.` },
-});
-fs.writeFileSync(path.join(out, 'JackAndTheBeanstalk.pdf'), pdf);
-console.log('saved', out);
+async function waitUntilSettled(api, id) {
+  let most = 0;
+  for (;;) {
+    const book = await (await api(`/api/books/${id}`)).json();
+    const states = Object.values(book.slots).map((s) => s.status);
+    most = Math.max(most, states.filter((s) => s === 'generating').length);
+    if (!states.some((s) => s === 'queued' || s === 'generating')) return { book, most };
+    await sleep(200);
+  }
+}
+
+assert.equal((await fetch(`${base}/api/books`)).status, 401, 'signed-out users are refused');
+
+const alice = await client('alice');
+const bob = await client('bob');
+
+const start = Date.now();
+const created = await alice('/api/books', 'POST', { photo, about: { name: 'Alice', age: '7' } });
+assert.equal(created.status, 200, 'book created');
+const { id } = await created.json();
+const { book, most } = await waitUntilSettled(alice, id);
+console.log(`book finished in ${Date.now() - start} ms, up to ${most} images at once`);
+console.log('slots:', Object.fromEntries(Object.entries(book.slots).map(([k, v]) => [k, v.status])));
+assert.ok(most >= 2, 'pages run in parallel');
+
+assert.equal((await bob(`/api/books/${id}`)).status, 404, "another user can't read the book");
+assert.equal((await bob(`/api/books/${id}/pdf`)).status, 404, "another user can't download the PDF");
+assert.equal((await bob(`/api/books/${id}/images/character`)).status, 404, "another user can't read images");
+assert.equal((await bob(`/api/books/${id}`, 'DELETE')).status, 404, "another user can't delete it");
+assert.equal((await (await bob('/api/books')).json()).some((b) => b.id === id), false, "it isn't on another user's shelf");
+
+const failed = Object.entries(book.slots).filter(([, s]) => s.status === 'error').map(([k]) => k);
+await Promise.all(failed.map(async (slot) => {
+  assert.equal((await alice(`/api/books/${id}/slots/${slot}/remake`, 'POST', {})).status, 200, 'retry accepted');
+}));
+if (failed.length) console.log('retried:', failed);
+const after = (await waitUntilSettled(alice, id)).book;
+assert.ok(Object.values(after.slots).every((s) => s.status === 'done'), 'everything finished');
+
+assert.equal((await alice(`/api/books/${id}/slots/trade/edit`, 'POST', { instruction: 'make the cow brown' })).status, 200, 'edit accepted');
+await waitUntilSettled(alice, id);
+
+const pdf = await alice(`/api/books/${id}/pdf`);
+assert.equal(pdf.status, 200, 'PDF builds');
+assert.equal(Buffer.from(await pdf.arrayBuffer()).subarray(0, 4).toString(), '%PDF');
+
+if (process.env.KEEP_BOOK) {
+  console.log('kept book', id);
+} else {
+  assert.equal((await alice(`/api/books/${id}`, 'DELETE')).status, 200, 'delete');
+  assert.equal((await alice(`/api/books/${id}`)).status, 404, 'deleted books are gone');
+}
+console.log('all checks passed');

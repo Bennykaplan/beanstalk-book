@@ -16,7 +16,12 @@ What still needs work in this build, from testing it on several different upload
 
 ## Pipeline
 - **Started on the cheap model, had to move up.** `gpt-image-1-mini` came out flat 2D (not the 3D animated style) and the child didn't look like the photo. `gpt-image-2` was nearly photorealistic. `gpt-image-1.5` with `input_fidelity: high` is the one that holds both the style and the face, but it costs more per page. Worth retesting mini with a stronger style prompt before scaling to 20 pages.
-- **Each page takes 30–60 seconds** and is made one click at a time. That's on purpose (no loops around the API call), but a 20-page book needs a better flow, like a "next page" button with progress, or a server-side job the user starts and comes back to.
-- **Nothing is saved.** Refreshing the browser loses the character sheet and every page. A 20-page book needs saving (at least in the browser) so one mistake doesn't cost the whole book.
+- **The per-image progress bars are estimates.** OpenAI reports nothing until an image is finished, so each bar fills based on a typical 60 seconds and stops at 92% until the image really arrives. "Done" and "Failed" are real; the percentage in between isn't.
+- **A server restart loses images in progress.** Generation runs inside the web process, and Render's free instance can restart. Finished images are safe in the database; interrupted ones show as failed after 6 minutes with a Try again button. A real job queue would resume them.
+- **Parallel generation is capped at 4 images across all users,** because OpenAI limits image calls per minute. A 20-page book would mostly wait in line, so the bars need testing at that size.
+- **Render's free Postgres expires after about 30 days** and holds 1 GB. Images are stored in the database, so that's only about 2,000 pictures. Real use needs a paid database, or moving the images to object storage (S3).
+- **Spending limits are simple daily caps** (25 images per user, 150 overall). They stop a runaway bill, but once they're hit, the whole app stops for the day.
+- **A failed character sheet needs the photo again,** because the photo is deliberately not stored. The app asks for it.
+- **Logs only go to Render's log page,** which keeps them for a limited time on the free plan. `generation_log` in the database is the long-term record of what each image cost in time, but nothing displays it yet.
 - **Page 4 (the beanstalk at dawn) is stubbed in `story.js`** (`enabled: false`). The two scenes from Part 1 (planting, climbing) still need to become pages in the right place in the story.
-- **The rate limit is per IP and kept in memory,** so it resets whenever Render restarts the free instance.
+- **Google sign-in can't be tested automatically.** The test script uses a local-only dev login, which is off on Render, so the real Google flow is only checked by hand.
