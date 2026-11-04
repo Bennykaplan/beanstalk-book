@@ -340,7 +340,7 @@ function tickBars() {
   const busy = list.some((slot) => isBusy(state.slots[slot]));
   const failed = list.filter((slot) => state.slots[slot]?.status === 'error').length;
   $('progTitle').textContent = busy ? `Making your book: ${done} of ${list.length} images done` : failed ? `${failed} image${failed > 1 ? 's' : ''} failed` : 'Your book is ready';
-  $('progNote').textContent = busy ? 'This usually takes about a minute. Your finished pictures are saved as they're done.' : '';
+  $('progNote').textContent = busy ? 'This usually takes about a minute. Finished pictures are saved as each one is done.' : '';
 }
 
 function applySlots(slots) {
