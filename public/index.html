@@ -96,6 +96,7 @@
           <div class="actions">
             <button id="makeBtn" disabled>Make my book</button>
           </div>
+          <p class="note">Your book takes about a minute. If the site has been idle, the first page load can take up to a minute too.</p>
           <p class="note">The photo is sent to OpenAI once to draw Jack and isn't saved here. The pictures are saved to your account until you delete them.</p>
           <div class="err" id="createErr"></div>
         </div>
@@ -155,7 +156,7 @@
 <script>
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-const EXPECTED_MS = 60000; // Typical time for one image, used only to animate its bar.
+const EXPECTED_MS = 25000; // Typical time for one image, used only to animate its bar.
 const SLOT_LABEL = { character: 'Drawing Jack' };
 const state = { storyboard: [], book: null, photo: null, slots: {}, shown: {}, pollTimer: null };
 
@@ -339,7 +340,7 @@ function tickBars() {
   const busy = list.some((slot) => isBusy(state.slots[slot]));
   const failed = list.filter((slot) => state.slots[slot]?.status === 'error').length;
   $('progTitle').textContent = busy ? `Making your book: ${done} of ${list.length} images done` : failed ? `${failed} image${failed > 1 ? 's' : ''} failed` : 'Your book is ready';
-  $('progNote').textContent = busy ? 'Each image takes about a minute. You can close this page and come back; your book keeps its finished pictures.' : '';
+  $('progNote').textContent = busy ? 'This usually takes about a minute. Your finished pictures are saved as they're done.' : '';
 }
 
 function applySlots(slots) {

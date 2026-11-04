@@ -2,7 +2,7 @@
 
 Upload a child's photo and get a *Jack and the Beanstalk* picture book starring them, downloaded as one PDF. This iteration builds the first 3 pages plus an About Me page.
 
-**Live:** https://book.everchargeelectric.com · **Sample book:** [samples/JackAndTheBeanstalk.pdf](samples/JackAndTheBeanstalk.pdf) · **What's left:** [to-do.md](to-do.md)
+**Live:** https://book.everchargeelectric.com · **Sample book:** [samples/JackAndTheBeanstalk.pdf](samples/JackAndTheBeanstalk.pdf) · **What's left:** [to-do.md](to-do.md) · **Feedback:** [10 real people vs. 10 AI reviewers](feedback/README.md)
 
 Sign in with Google, make a book, and it's still there when you come back.
 

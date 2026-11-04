@@ -1,6 +1,14 @@
 # To-do: Beanstalk storybook (first 3 pages)
 
-What still needs work in this build, from testing it on several different uploads (an 8-year-old girl, a man in his 20s with glasses, a man in his 30s with curly hair and glasses).
+What still needs work in this build, from testing on several uploads and from [10 real people and 10 AI reviewers](feedback/README.md).
+
+## Top priority, from the feedback
+- **Jack still looks too young.** The biggest complaint from both real people and AI: "me as a 5 year old". The prompt now forbids making anyone younger, which helped adults, but they now read as short adults, and an 8-year-old still looks about 6. The style's "large expressive eyes" and round forms pull toward a little kid. Next: pass the About Me age into the prompt, and try a "head size" instruction.
+- **Faces drift toward generic cartoon.** 3 of 10 real people weren't convinced it looked like them, and 7 of 10 AI reviewers made the same complaint. Glasses and hair carry over better than the eyes, nose and face shape. An AI reviewer also said Asian features get softened; that needs testing with more real faces and a real person's opinion.
+- **The story says Jack whatever the child's name is.** About Me now says "starring as Jack", but a personalized book should probably use the child's name, and "his" doesn't fit every child. The text comes from the storyboard, so this is a question for the next iteration.
+- **The first page load is slow on Render's free plan,** because the server sleeps when idle (Person 1 noticed). A paid instance fixes it.
+- **My survey questions need explaining.** Two real people didn't understand "ring true" or "professional". Next time, ask "Does this feel like the real Jack and the Beanstalk?"
+- **Real feedback was thin.** Friends and family were polite and mostly wrote one word. A paid crowd study would likely be more honest before the 20-page version ships.
 
 ## Faces and consistency
 - **Glasses drop off on page 3.** Jack has glasses on the character sheet and on pages 1–2, but on page 3 (dusk, backlit in the doorway) he sometimes loses them. The Edit box fixes it ("give Jack his glasses back") without redrawing the page, but it should be right the first time.
@@ -12,7 +20,8 @@ What still needs work in this build, from testing it on several different upload
 - **Page 1's lower third isn't empty.** The prompt reserves it for text, but Jack's body and the mother's apron still end up there, so the story text sits over the characters. It's readable because of the dark gradient, but the art and text overlap.
 - **Page 2's sky isn't fully clear.** The old man's hat and Jack's head reach into the top third, close to the text.
 - **Page 1: "full face, looking at his mother" is a compromise.** Jack's face is visible but he's turned three-quarters toward her. The model won't do a fully front-facing face with eyes on someone beside him.
-- **The five beans are sometimes four or six.**
+- **The bean count is still unreliable.** AI reviewers saw about nine beans on page 3 against five on page 2. The prompt now says exactly five, but that isn't proven yet.
+- **The mother's apron changed between pages.** The prompt now fixes the apron; check it across more books.
 
 ## Pipeline
 - **Started on the cheap model, had to move up.** `gpt-image-1-mini` came out flat 2D (not the 3D animated style) and the child didn't look like the photo. `gpt-image-2` was nearly photorealistic. `gpt-image-1.5` with `input_fidelity: high` is the one that holds both the style and the face, but it costs more per page. Worth retesting mini with a stronger style prompt before scaling to 20 pages.

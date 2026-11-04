@@ -34,11 +34,21 @@ function drawStoryText(doc, text, area) {
 
 function drawAboutMe(doc, about, character) {
   doc.rect(0, 0, W, H).fill('#fbf6e9');
-  if (character) doc.image(toBuffer(character), 40, 64, { fit: [360, 400], align: 'center', valign: 'center' });
+  if (character) {
+    // The sheet is 3:2 with the front view on its left half; show only that half.
+    const boxH = 400;
+    const boxW = boxH * 0.75;
+    const x = 70;
+    const y = 64;
+    doc.save().roundedRect(x, y, boxW, boxH, 14).clip();
+    doc.image(toBuffer(character), x, y, { width: boxH * 1.5 });
+    doc.restore();
+  }
   const x = 430;
   const w = W - x - 50;
   doc.font(FONT).fillColor('#3f8a3a').fontSize(22).text('About Me', x, 70, { width: w });
   doc.fillColor('#23311f').fontSize(40).text(about.name || 'Jack', x, 100, { width: w });
+  doc.fillColor('#66705f').fontSize(16).text(about.name ? 'starring as Jack' : 'our hero', x, doc.y + 2, { width: w });
   let y = doc.y + 18;
   for (const [label, value] of [['Age', about.age], ['Favorite things', about.favorites], ['About me', about.bio]]) {
     if (!value) continue;

@@ -9,11 +9,11 @@ export const JACK_OUTFIT =
 
 export const CAST = {
   jack:
-    'Jack: the child from the reference character sheet. Same face, hair, skin tone, eye color, age and body as on the sheet, ' +
+    'Jack: the person from the reference character sheet. Same face, hair, skin tone, eye color, age, height and build as on the sheet, ' +
     `wearing exactly the outfit from the sheet (${JACK_OUTFIT}).`,
   mother:
     "Jack's mother: a grown-up adult woman, clearly taller and older than Jack, slim, in her late thirties with the same skin tone and hair color as Jack, hair tied in a loose bun, " +
-    'a faded blue dress with a patched cream apron, a tired but kind face.',
+    'a faded blue dress with a full-length patched cream apron tied at the waist (the same on every page), a tired but kind face.',
   cow:
     'Milky-White: a gentle, thin, all-white dairy cow with a pink nose, a small brass bell on a leather collar and a frayed rope halter.',
   oldMan:
@@ -23,7 +23,10 @@ export const CAST = {
 const IDENTITY =
   'Identity is the top priority: the face must be recognizably the same child as in the photo. Preserve face shape and width, ' +
   'eye shape, spacing and color, eyebrows, nose, mouth, ears, hairline, hairstyle, hair length, color and texture, skin tone, ' +
-  'freckles, moles, glasses and hair accessories (headbands, clips, bows) if any, and apparent age (a child stays a child of the same age). Do not beautify, age or swap features.';
+  'freckles, moles, glasses and hair accessories (headbands, clips, bows) if any. ' +
+  'Keep the apparent age of the person in the photo, and never make them look younger: a child stays a child of the same age, ' +
+  'with realistic proportions and not a toddler\'s body, and an adult is drawn as an adult. Keep their real face proportions under the style. ' +
+  'Do not beautify, age or swap features.';
 
 const NO_TEXT = 'Do not draw any text, letters, numbers, words, signs, labels, speech bubbles or captions anywhere in the image.';
 
@@ -70,8 +73,8 @@ export const PAGES = [
     scene:
       "The front of Jack's cottage at dusk, seen from the garden. There are exactly two people in the picture. " +
       "(1) Jack's mother, the grown-up woman with her hair in a bun and a blue dress, clearly an adult, leans out of an open window on the front wall and flings the beans; " +
-      'the five colored beans scatter through the air and fall into the garden below. ' +
-      '(2) Jack, the child from the character sheet, stands on the ground in the open front doorway right beside that window, ' +
+      'exactly five colored beans (red, blue, yellow, purple and green, no more) scatter through the air and fall into the garden below. ' +
+      '(2) Jack, from the character sheet, stands on the ground in the open front doorway right beside that window, ' +
       'his whole body visible, lit from behind by warm firelight, his face turned toward the viewer as he watches the beans fall.',
     framing:
       'The camera is close to the cottage: the doorway and window fill most of the width, and Jack in the doorway is large, ' +
@@ -99,10 +102,10 @@ export const PAGES = [
 export function characterPrompt() {
   return [
     STYLE,
-    'Create a character reference sheet of the child in this photo as Jack from "Jack and the Beanstalk".',
+    'Create a character reference sheet of the person in this photo as Jack from "Jack and the Beanstalk".',
     IDENTITY,
     `Outfit: ${JACK_OUTFIT}.`,
-    'Show two full-body views of the same child side by side on a plain light-grey background: on the left a front view, ' +
+    'Show two full-body views of the same person side by side on a plain light-grey background: on the left a front view, ' +
       'on the right a three-quarter view. Neutral standing pose, friendly expression, even lighting. Exactly one character, shown twice.',
     NO_TEXT,
   ].join('\n\n');
@@ -112,7 +115,7 @@ export function pagePrompt(page, number) {
   return [
     STYLE,
     `This is page ${number} of a children's picture book of "Jack and the Beanstalk". ` +
-      'The reference image is the character sheet for Jack; Jack must look exactly like that child on every page.',
+      'The reference image is the character sheet for Jack; Jack must look exactly like that person on every page, at the same age.',
     'Characters in this picture:\n' + page.cast.map((c) => `- ${CAST[c]}`).join('\n'),
     `Scene: ${page.scene}`,
     `Composition: ${page.framing} Landscape full-bleed illustration.`,
