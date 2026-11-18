@@ -1,58 +1,42 @@
 # Beanstalk Storybook
 
-Upload a child's photo and get a *Jack and the Beanstalk* picture book starring them, downloaded as one PDF. This iteration builds the first 3 pages plus an About Me page.
+Upload a photo of a child, pick *Jack and the Beanstalk* or *Little Red Riding Hood*, and in about a minute they're the hero of a 20-page illustrated book. Download the PDF, or order it printed as an 11 × 8.5 in hardcover.
 
-**Live:** https://book.everchargeelectric.com · **Sample book:** [samples/JackAndTheBeanstalk.pdf](samples/JackAndTheBeanstalk.pdf) · **What's left:** [to-do.md](to-do.md) · **Feedback:** [10 real people vs. 10 AI reviewers](feedback/README.md)
+**Live:** https://book.everchargeelectric.com · **Write-up:** [WRITEUP.md](WRITEUP.md) · **Pricing:** [PRICING.md](PRICING.md) · **What's left:** [to-do.md](to-do.md) · **Self-review log:** [review-log.md](review-log.md)
 
-Sign in with Google, make a book, and it's still there when you come back.
+Test mode throughout: payments use Stripe's test sandbox and print orders use Lulu's sandbox.
 
 ## How it works
 
-All image calls use OpenAI's **image edit endpoint** (`/v1/images/edits`, model `gpt-image-1.5`, `input_fidelity: high`), because every picture starts from a reference image.
-
-1. **Character sheet.** The photo becomes one reference image of the child as Jack (front and three-quarter views). That one image, plus one style string, goes into every page call, so Jack looks the same on every page.
-2. **Pages.** Each page is one image call: the style string, the fixed cast descriptions (mother, Milky-White, the old man), the scene, and a framing line that keeps the text area of the art empty.
-3. **Edit.** "Change one thing" sends the existing page (plus the character sheet) back to the edit endpoint with an instruction, instead of regenerating the page.
-4. **Parallel with progress.** The character sheet is made first, then every page at once. Each image has its own progress bar, and the page polls the server for real status.
-5. **PDF.** `pdf.js` lays each page out full-bleed and draws the story text on top in Fredoka over a soft gradient. The image model never draws text. The last page is About Me, built from what the uploader typed.
+1. **Character bible and scenes, made once** (`pregen.mjs` → `assets/` → database). Every recurring character gets a reference image, then all 20 scenes of each story are drawn from those references with a stand-in hero.
+2. **A book** (`pipeline.js`). The child's photo is edited into the 20 scenes of the chosen story, all at once (OpenAI image edits). Each page is checked by a vision model; a failed page is redone, up to 3 tries, and if none passes the best is kept. A character sheet of the child is stored in the bible for the back cover and later edits.
+3. **Words placed where they cover nothing** (`layout.js`). The check returns boxes around every face and key object; the words go in a band that misses them all, or on their own strip below the picture.
+4. **PDFs** (`pdf.js`). A reading copy, plus the printer's two files: a 24-page interior (copyright page, 20 story pages, The End, 2 blank) and a wrap-around cover spread sized by Lulu's API.
+5. **Money** (`wallet.js`). Stripe Checkout tops up a wallet; each book takes $0.99; refunds go back to the card through Stripe; every movement is a ledger row. Every AI call's real cost is logged, and the wallet page shows the average cost per book.
+6. **Printing** (`lulu.js`). Proof → approve → address → live Lulu quote → order, in Lulu's sandbox.
 
 | File | What's in it |
 | --- | --- |
-| `story.js` | The style string, the cast, the storyboard and every prompt. Prompt work happens here. |
-| `server.js` | Express API: `/api/character`, `/api/page`, `/api/edit`, `/api/pdf`. One model call per request, no retries or loops. |
-| `pdf.js` | PDF layout (pdfkit). |
-| `public/index.html` | The app. |
-| `test.mjs` | End-to-end test against a local server with fake images: login, parallel pages, retry, edit, PDF, delete, and that another user can't reach the book. |
-
-| `auth.js` | Sign in with Google (OAuth 2.0 / OpenID Connect) and signed session cookies. |
-| `db.js` | Postgres: users, books, images and a log of every image call. Local runs use PGlite. |
-| `images.js` | The OpenAI call, the limit on parallel calls, and a free mock provider for testing. |
-| `log.js` | JSON logs to stdout: requests, logins and every image with its duration and outcome. No photos, keys or emails. |
-
-The photo is sent to OpenAI once to draw the character sheet and is never stored here. Every book lookup checks ownership, so one user can't reach another user's book. Users can delete a book, which removes its images.
-
-The style string is exactly: `Modern 3D animated feature — rounded forms, large expressive eyes, soft rim light.`
-
-## How the prompt was developed
-
-I tried prompts by hand in the OpenAI Playground (Images) first, then used AI (Claude) to rewrite the prompt after every round. Each round I tested on three different uploads and wrote down what was wrong.
-
-1. **Round 1:** Page 2 worked first time. Page 1 showed Jack in profile with the cow inside the doorway. Page 3 left Jack out completely and drew the mother looking like the child. The character sheet dropped the girl's headband.
-2. **Round 2:** Page 3 now says "exactly two people" and numbers them. The mother is "clearly an adult, taller than Jack". Page 1 asks for a knees-up medium shot with Jack facing the viewer. Accessories were added to the identity list. Result: both people are on page 3, and the headband stays.
-3. **Round 3:** Jack's face on page 3 was too small to recognize, so the prompt now sets a minimum head size and a closer camera. The cow is pushed "a few steps away from the door".
-4. **Model choice:** I started on the cheapest model, `gpt-image-1-mini`, as the homework says. It came out flat 2D and the child didn't look like the photo. `gpt-image-2` came out nearly photorealistic. `gpt-image-1.5` with `input_fidelity: high` kept both the 3D style and the face, so that's what the app uses.
-5. **Edit endpoint:** for "same page, one thing different" (a missing accessory, say), editing the page kept everything else identical, where regenerating would have changed the whole picture.
-
-Rounds 1–3 were first worked out on Gemini's image model, then rerun on OpenAI. The prompts carried over unchanged. What's still wrong is in [to-do.md](to-do.md).
+| `stories.js` | The style string, the 20-page template, both storyboards, the cast, and every prompt. |
+| `pipeline.js` | Making a book: parallel pages, the 3-try check loop, the character sheet. |
+| `images.js` | OpenAI calls (image edits, vision checks), the per-minute queue, and a free mock mode. |
+| `layout.js` | Where the words go on each page. |
+| `pdf.js` | Reading PDF, print interior, cover spread. |
+| `wallet.js`, `costs.js` | Stripe wallet, ledger, refunds; cost of every API call. |
+| `validate.js` | About Me checks: name shape, word list, moderation, real-name check; photo moderation. |
+| `lulu.js` | Lulu Print API (sandbox only). |
+| `auth.js`, `db.js`, `log.js`, `seed.js` | Google sign-in, Postgres schema, JSON logs, loading `assets/` into the database. |
+| `public/` | The app (`index.html`, `app.js`) and the privacy page. |
+| `test.mjs` | End-to-end test with free mock images: wallet, refunds, book, retries, ownership, print-order rules. |
 
 ## Run locally
 
 ```bash
 npm install
-cp .env.example .env   # then put your OPENAI_API_KEY in .env
+cp .env.example .env   # add OPENAI_API_KEY, STRIPE_SECRET_KEY, LULU_CLIENT_KEY, LULU_CLIENT_SECRET
 npm start              # http://localhost:3020
 ```
 
-For free local testing add `IMAGE_PROVIDER=mock` and `DEV_LOGIN=1` to `.env`, then run `node test.mjs <photo>`. For a real but cheap run, use `OPENAI_IMAGE_QUALITY=low`.
+`IMAGE_PROVIDER=mock` and `DEV_LOGIN=1` in `.env` make it free to run and test: `node test.mjs <photo>`.
 
-`.env` is in `.gitignore`. The key is never committed. On Render it's set in the service's Environment settings, along with `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `SESSION_SECRET` and `DATABASE_URL`.
+`.env` is in `.gitignore`; no key is ever committed. On Render the same settings go in the service's Environment page.

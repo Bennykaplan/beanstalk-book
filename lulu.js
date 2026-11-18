@@ -5,7 +5,7 @@ import { log } from './log.js';
 const API = process.env.LULU_API || 'https://api.sandbox.lulu.com';
 // 11 x 8.5 in landscape, full colour, standard quality, hardcover (casewrap), 80# coated white, matte.
 export const POD_PACKAGE = process.env.LULU_POD_PACKAGE || '1100X0850.FC.STD.CW.080CW444.MXX';
-export const SHIPPING_LEVELS = ['MAIL', 'GROUND', 'EXPEDITED'];
+export const SHIPPING_LEVELS = ['MAIL', 'PRIORITY_MAIL', 'EXPEDITED'];
 export const configured = () => Boolean(process.env.LULU_CLIENT_KEY && process.env.LULU_CLIENT_SECRET);
 
 if (!/sandbox/.test(API)) throw new Error('This app only talks to the Lulu sandbox.');

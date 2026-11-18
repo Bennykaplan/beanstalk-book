@@ -409,7 +409,7 @@ async function walletView() {
 
 const US_STATES = 'AL AK AZ AR CA CO CT DE DC FL GA HI ID IL IN IA KS KY LA ME MD MA MI MN MS MO MT NE NV NH NJ NM NY NC ND OH OK OR PA RI SC SD TN TX UT VT VA WA WV WI WY'.split(' ');
 const ADDRESS = [['name', 'Full name', 35], ['street1', 'Street address', 30], ['street2', 'Apartment, suite (optional)', 30], ['city', 'City', 30], ['postcode', 'ZIP code', 10], ['phone_number', 'Phone', 20], ['email', 'Email for shipping updates', 80]];
-const SHIP = { MAIL: 'Standard mail', GROUND: 'Ground', EXPEDITED: 'Expedited' };
+const SHIP = { MAIL: 'Standard mail', PRIORITY_MAIL: 'Priority mail', EXPEDITED: 'Expedited' };
 
 async function orderView(id) {
   const o = await api(`/api/orders/${id}`);
