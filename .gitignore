@@ -5,3 +5,4 @@ test-photos/
 test-output-gemini/
 .localdb*/
 feedback-private/
+.localdb*/

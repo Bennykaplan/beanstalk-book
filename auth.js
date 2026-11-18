@@ -128,6 +128,17 @@ export function authRoutes(app) {
   });
 
   if (DEV_LOGIN) {
+    // Local tests only: record a card payment the test script made directly with Stripe's
+    // test API, as if it had come back from Checkout.
+    app.post('/auth/dev/deposit', async (req, res) => {
+      if (!req.user) return res.status(401).end();
+      const { rows } = await query(
+        `INSERT INTO ledger (user_id, amount_cents, kind, status, description, stripe_ref)
+         VALUES ($1, $2, 'deposit', 'completed', 'Added money by card (test)', $3) RETURNING id`,
+        [req.user.id, Number(req.body.cents), String(req.body.paymentIntent)],
+      );
+      res.json({ id: rows[0].id });
+    });
     app.post('/auth/dev', async (req, res) => {
       const who = String(req.body.who || 'dev');
       startSession(req, res, await upsertUser(`dev:${who}`, `${who}@example.test`, who));

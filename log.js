@@ -5,7 +5,7 @@ export function log(event, fields = {}) {
 }
 
 // Skips the polling and image requests a book page makes constantly, unless they fail.
-const QUIET = /^\/(healthz|api\/books\/[^/]+(\/images\/.*)?)$/;
+const QUIET = /^\/(healthz|api\/me|api\/books\/[^/]+(\/(images|thumbs)\/.*)?|api\/orders\/\d+|api\/stories\/.*)$/;
 
 export function requestLog(req, res, next) {
   const start = Date.now();

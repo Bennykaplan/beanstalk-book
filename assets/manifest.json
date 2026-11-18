@@ -1,0 +1,1606 @@
+{
+  "stories": {
+    "jack": {
+      "bible": {
+        "hen": {
+          "file": "jack/bible-hen.jpg",
+          "description": "The magic hen: a plump, glossy brown hen with a red comb who lays shining golden eggs."
+        },
+        "giant": {
+          "file": "jack/bible-giant.jpg",
+          "description": "The giant: an enormous, clumsy, grumpy giant (comic, not frightening) with a bushy red beard, a big round nose, a brown leather vest and huge boots."
+        },
+        "cow": {
+          "file": "jack/bible-cow.jpg",
+          "description": "Milky-White: a gentle, thin, all-white dairy cow with a pink nose, a small brass bell on a leather collar and a frayed rope halter."
+        },
+        "hero": {
+          "file": "jack/bible-hero.jpg",
+          "description": "Jack (stand-in, replaced by the child in every book)"
+        },
+        "giantWife": {
+          "file": "jack/bible-giantWife.jpg",
+          "description": "The giant's wife: a very tall, round, kind-faced giantess with grey hair in a bun, a green dress and a flour-dusted apron."
+        },
+        "oldMan": {
+          "file": "jack/bible-oldMan.jpg",
+          "description": "The old man: a small, hunched, kindly but mysterious old man with a long white beard, a wide-brimmed patched green hat and a long brown traveling cloak."
+        },
+        "mother": {
+          "file": "jack/bible-mother.jpg",
+          "description": "Jack's mum: a friendly adult village woman with brown hair in a loose bun, a faded blue dress and a long patched cream apron."
+        }
+      },
+      "scenes": {
+        "1": {
+          "file": "jack/scene-01.jpg",
+          "analysis": {
+            "hero_visible": true,
+            "likeness": 9,
+            "scene_match": 9,
+            "defects": [],
+            "important": [
+              {
+                "label": "Jack face",
+                "x": 0.12,
+                "y": 0.52,
+                "w": 0.07,
+                "h": 0.12
+              },
+              {
+                "label": "Jack's mother face",
+                "x": 0.22,
+                "y": 0.44,
+                "w": 0.1,
+                "h": 0.18
+              },
+              {
+                "label": "Milky-White",
+                "x": 0.65,
+                "y": 0.55,
+                "w": 0.25,
+                "h": 0.3
+              },
+              {
+                "label": "cottage",
+                "x": 0,
+                "y": 0.2,
+                "w": 0.4,
+                "h": 0.5
+              }
+            ]
+          }
+        },
+        "2": {
+          "file": "jack/scene-02.jpg",
+          "analysis": {
+            "hero_visible": true,
+            "likeness": 9,
+            "scene_match": 7,
+            "defects": [
+              "The cupboard shelves are not completely empty; there is a bowl on the middle shelf.",
+              "The bowl on the table is not empty.",
+              "The kitchen is not bare enough; there is a cupboard and a table with a bowl.",
+              "Jack's mother is present but not explicitly identified as 'mother' in the text.",
+              "Milky-White is outside but not clearly labeled or identified as the cow in the character sheet."
+            ],
+            "important": [
+              {
+                "label": "Jack's face",
+                "x": 0.12,
+                "y": 0.45,
+                "w": 0.15,
+                "h": 0.25
+              },
+              {
+                "label": "Jack's mother's face",
+                "x": 0.3,
+                "y": 0.35,
+                "w": 0.2,
+                "h": 0.35
+              },
+              {
+                "label": "Milky-White (cow)",
+                "x": 0.75,
+                "y": 0.35,
+                "w": 0.2,
+                "h": 0.5
+              },
+              {
+                "label": "Empty cupboard shelves",
+                "x": 0.02,
+                "y": 0.1,
+                "w": 0.2,
+                "h": 0.5
+              },
+              {
+                "label": "Bowl on table",
+                "x": 0.75,
+                "y": 0.75,
+                "w": 0.1,
+                "h": 0.1
+              }
+            ]
+          }
+        },
+        "3": {
+          "file": "jack/scene-03.jpg",
+          "analysis": {
+            "hero_visible": true,
+            "likeness": 9,
+            "scene_match": 9,
+            "defects": [],
+            "important": [
+              {
+                "label": "Old man face",
+                "x": 0.05,
+                "y": 0.2,
+                "w": 0.25,
+                "h": 0.4
+              },
+              {
+                "label": "Old man's hand with five beans",
+                "x": 0.25,
+                "y": 0.5,
+                "w": 0.15,
+                "h": 0.1
+              },
+              {
+                "label": "Jack's face",
+                "x": 0.6,
+                "y": 0.3,
+                "w": 0.2,
+                "h": 0.3
+              },
+              {
+                "label": "Jack's hand holding rope",
+                "x": 0.7,
+                "y": 0.6,
+                "w": 0.15,
+                "h": 0.15
+              },
+              {
+                "label": "Milky-White's head",
+                "x": 0.45,
+                "y": 0.4,
+                "w": 0.25,
+                "h": 0.3
+              }
+            ]
+          }
+        },
+        "4": {
+          "file": "jack/scene-04.jpg",
+          "analysis": {
+            "hero_visible": true,
+            "likeness": 9,
+            "scene_match": 8,
+            "defects": [
+              "The beans are six in number, not five.",
+              "Bean colors include orange instead of yellow."
+            ],
+            "important": [
+              {
+                "label": "Jack's face",
+                "x": 0.35,
+                "y": 0.1,
+                "w": 0.3,
+                "h": 0.4
+              },
+              {
+                "label": "Jack's open palm with beans",
+                "x": 0.25,
+                "y": 0.45,
+                "w": 0.5,
+                "h": 0.3
+              }
+            ]
+          }
+        },
+        "5": {
+          "file": "jack/scene-05.jpg",
+          "analysis": {
+            "hero_visible": true,
+            "likeness": 9,
+            "scene_match": 9,
+            "defects": [],
+            "important": [
+              {
+                "label": "Jack's face",
+                "x": 0.15,
+                "y": 0.45,
+                "w": 0.15,
+                "h": 0.25
+              },
+              {
+                "label": "Jack's head",
+                "x": 0.15,
+                "y": 0.45,
+                "w": 0.15,
+                "h": 0.25
+              },
+              {
+                "label": "Jack's mother face",
+                "x": 0.65,
+                "y": 0.25,
+                "w": 0.2,
+                "h": 0.3
+              },
+              {
+                "label": "Jack's mother head",
+                "x": 0.65,
+                "y": 0.25,
+                "w": 0.2,
+                "h": 0.3
+              },
+              {
+                "label": "Five colored beans",
+                "x": 0.4,
+                "y": 0.4,
+                "w": 0.25,
+                "h": 0.1
+              },
+              {
+                "label": "Cottage window",
+                "x": 0.6,
+                "y": 0.2,
+                "w": 0.3,
+                "h": 0.4
+              }
+            ]
+          }
+        },
+        "6": {
+          "file": "jack/scene-06.jpg",
+          "analysis": {
+            "hero_visible": true,
+            "likeness": 9,
+            "scene_match": 8,
+            "defects": [],
+            "important": [
+              {
+                "label": "Jack's face",
+                "x": 0.55,
+                "y": 0.35,
+                "w": 0.25,
+                "h": 0.35
+              },
+              {
+                "label": "Moon",
+                "x": 0.1,
+                "y": 0.15,
+                "w": 0.25,
+                "h": 0.25
+              }
+            ]
+          }
+        },
+        "7": {
+          "file": "jack/scene-07.jpg",
+          "analysis": {
+            "hero_visible": true,
+            "likeness": 9,
+            "scene_match": 9,
+            "defects": [],
+            "important": [
+              {
+                "label": "Jack's face",
+                "x": 0.15,
+                "y": 0.25,
+                "w": 0.15,
+                "h": 0.25
+              },
+              {
+                "label": "Beanstalk",
+                "x": 0.55,
+                "y": 0.15,
+                "w": 0.25,
+                "h": 0.7
+              }
+            ]
+          }
+        },
+        "8": {
+          "file": "jack/scene-08.jpg",
+          "analysis": {
+            "hero_visible": true,
+            "likeness": 9,
+            "scene_match": 10,
+            "defects": [],
+            "important": [
+              {
+                "label": "Jack's face",
+                "x": 0.48,
+                "y": 0.35,
+                "w": 0.12,
+                "h": 0.15
+              },
+              {
+                "label": "Jack's head",
+                "x": 0.48,
+                "y": 0.35,
+                "w": 0.12,
+                "h": 0.15
+              },
+              {
+                "label": "Beanstalk",
+                "x": 0.55,
+                "y": 0.2,
+                "w": 0.15,
+                "h": 0.6
+              },
+              {
+                "label": "Birds",
+                "x": 0.25,
+                "y": 0.3,
+                "w": 0.15,
+                "h": 0.15
+              }
+            ]
+          }
+        },
+        "9": {
+          "file": "jack/scene-09.jpg",
+          "analysis": {
+            "hero_visible": true,
+            "likeness": 9,
+            "scene_match": 9,
+            "defects": [],
+            "important": [
+              {
+                "label": "Jack's face",
+                "x": 0.05,
+                "y": 0.3,
+                "w": 0.15,
+                "h": 0.25
+              },
+              {
+                "label": "Jack's head",
+                "x": 0.05,
+                "y": 0.3,
+                "w": 0.15,
+                "h": 0.25
+              },
+              {
+                "label": "Castle",
+                "x": 0.3,
+                "y": 0,
+                "w": 0.7,
+                "h": 1
+              },
+              {
+                "label": "Cloud path",
+                "x": 0,
+                "y": 0.6,
+                "w": 0.5,
+                "h": 0.4
+              }
+            ]
+          }
+        },
+        "10": {
+          "file": "jack/scene-10.jpg",
+          "analysis": {
+            "hero_visible": true,
+            "likeness": 9,
+            "scene_match": 9,
+            "defects": [],
+            "important": [
+              {
+                "label": "Jack's face",
+                "x": 0.07,
+                "y": 0.55,
+                "w": 0.1,
+                "h": 0.2
+              },
+              {
+                "label": "Giantess face",
+                "x": 0.4,
+                "y": 0.3,
+                "w": 0.3,
+                "h": 0.3
+              },
+              {
+                "label": "Giantess finger to lips",
+                "x": 0.5,
+                "y": 0.5,
+                "w": 0.1,
+                "h": 0.15
+              },
+              {
+                "label": "Castle doorway",
+                "x": 0.3,
+                "y": 0.2,
+                "w": 0.4,
+                "h": 0.7
+              }
+            ]
+          }
+        },
+        "11": {
+          "file": "jack/scene-11.jpg",
+          "analysis": {
+            "hero_visible": true,
+            "likeness": 9,
+            "scene_match": 9,
+            "defects": [],
+            "important": [
+              {
+                "label": "Jack's face",
+                "x": 0.65,
+                "y": 0.45,
+                "w": 0.25,
+                "h": 0.35
+              },
+              {
+                "label": "Giant's face",
+                "x": 0.15,
+                "y": 0.2,
+                "w": 0.3,
+                "h": 0.4
+              },
+              {
+                "label": "Giant copper pot",
+                "x": 0.6,
+                "y": 0.5,
+                "w": 0.35,
+                "h": 0.45
+              }
+            ]
+          }
+        },
+        "12": {
+          "file": "jack/scene-12.jpg",
+          "analysis": {
+            "hero_visible": true,
+            "likeness": 9,
+            "scene_match": 10,
+            "defects": [],
+            "important": [
+              {
+                "label": "giant head",
+                "x": 0.05,
+                "y": 0.15,
+                "w": 0.3,
+                "h": 0.4
+              },
+              {
+                "label": "giant hand holding gold",
+                "x": 0.3,
+                "y": 0.5,
+                "w": 0.15,
+                "h": 0.15
+              },
+              {
+                "label": "gold coins pile",
+                "x": 0,
+                "y": 0.55,
+                "w": 0.5,
+                "h": 0.4
+              },
+              {
+                "label": "Jack head",
+                "x": 0.65,
+                "y": 0.5,
+                "w": 0.15,
+                "h": 0.3
+              },
+              {
+                "label": "Jack body",
+                "x": 0.6,
+                "y": 0.6,
+                "w": 0.25,
+                "h": 0.35
+              }
+            ]
+          }
+        },
+        "13": {
+          "file": "jack/scene-13.jpg",
+          "analysis": {
+            "hero_visible": true,
+            "likeness": 9,
+            "scene_match": 10,
+            "defects": [],
+            "important": [
+              {
+                "label": "Jack's face",
+                "x": 0.05,
+                "y": 0.3,
+                "w": 0.25,
+                "h": 0.4
+              },
+              {
+                "label": "Magic hen's head",
+                "x": 0.5,
+                "y": 0.3,
+                "w": 0.3,
+                "h": 0.5
+              },
+              {
+                "label": "Golden egg",
+                "x": 0.4,
+                "y": 0.65,
+                "w": 0.15,
+                "h": 0.15
+              }
+            ]
+          }
+        },
+        "14": {
+          "file": "jack/scene-14.jpg",
+          "analysis": {
+            "hero_visible": true,
+            "likeness": 9,
+            "scene_match": 9,
+            "defects": [],
+            "important": [
+              {
+                "label": "Jack face",
+                "x": 0.15,
+                "y": 0.15,
+                "w": 0.25,
+                "h": 0.4
+              },
+              {
+                "label": "Hen",
+                "x": 0.05,
+                "y": 0.3,
+                "w": 0.25,
+                "h": 0.4
+              },
+              {
+                "label": "Giant boot",
+                "x": 0.7,
+                "y": 0.3,
+                "w": 0.3,
+                "h": 0.5
+              }
+            ]
+          }
+        },
+        "15": {
+          "file": "jack/scene-15.jpg",
+          "analysis": {
+            "hero_visible": true,
+            "likeness": 9,
+            "scene_match": 9,
+            "defects": [],
+            "important": [
+              {
+                "label": "Jack face",
+                "x": 0.55,
+                "y": 0.3,
+                "w": 0.15,
+                "h": 0.25
+              },
+              {
+                "label": "Jack body",
+                "x": 0.5,
+                "y": 0.4,
+                "w": 0.3,
+                "h": 0.5
+              },
+              {
+                "label": "Magic hen",
+                "x": 0.65,
+                "y": 0.45,
+                "w": 0.15,
+                "h": 0.25
+              },
+              {
+                "label": "Giant face",
+                "x": 0.1,
+                "y": 0.2,
+                "w": 0.25,
+                "h": 0.3
+              },
+              {
+                "label": "Giant body",
+                "x": 0.05,
+                "y": 0.3,
+                "w": 0.4,
+                "h": 0.6
+              }
+            ]
+          }
+        },
+        "16": {
+          "file": "jack/scene-16.jpg",
+          "analysis": {
+            "hero_visible": true,
+            "likeness": 9,
+            "scene_match": 9,
+            "defects": [],
+            "important": [
+              {
+                "label": "Jack's face",
+                "x": 0.62,
+                "y": 0.35,
+                "w": 0.15,
+                "h": 0.25
+              },
+              {
+                "label": "Magic hen",
+                "x": 0.55,
+                "y": 0.45,
+                "w": 0.15,
+                "h": 0.25
+              },
+              {
+                "label": "Giant's face",
+                "x": 0.15,
+                "y": 0.15,
+                "w": 0.2,
+                "h": 0.3
+              }
+            ]
+          }
+        },
+        "17": {
+          "file": "jack/scene-17.jpg",
+          "analysis": {
+            "hero_visible": true,
+            "likeness": 9,
+            "scene_match": 9,
+            "defects": [],
+            "important": [
+              {
+                "label": "Jack face",
+                "x": 0.35,
+                "y": 0.3,
+                "w": 0.15,
+                "h": 0.2
+              },
+              {
+                "label": "Jack axe",
+                "x": 0.25,
+                "y": 0.4,
+                "w": 0.1,
+                "h": 0.1
+              },
+              {
+                "label": "Beanstalk",
+                "x": 0.1,
+                "y": 0.2,
+                "w": 0.2,
+                "h": 0.6
+              },
+              {
+                "label": "Mother face",
+                "x": 0.7,
+                "y": 0.3,
+                "w": 0.15,
+                "h": 0.2
+              }
+            ]
+          }
+        },
+        "18": {
+          "file": "jack/scene-18.jpg",
+          "analysis": {
+            "hero_visible": true,
+            "likeness": 7,
+            "scene_match": 9,
+            "defects": [],
+            "important": [
+              {
+                "label": "Jack face",
+                "x": 0.58,
+                "y": 0.48,
+                "w": 0.07,
+                "h": 0.12
+              },
+              {
+                "label": "Jack's mother face",
+                "x": 0.66,
+                "y": 0.42,
+                "w": 0.08,
+                "h": 0.14
+              },
+              {
+                "label": "Toppled beanstalk",
+                "x": 0.15,
+                "y": 0.35,
+                "w": 0.45,
+                "h": 0.35
+              }
+            ]
+          }
+        },
+        "19": {
+          "file": "jack/scene-19.jpg",
+          "analysis": {
+            "hero_visible": true,
+            "likeness": 9,
+            "scene_match": 9,
+            "defects": [],
+            "important": [
+              {
+                "label": "Jack face",
+                "x": 0.55,
+                "y": 0.3,
+                "w": 0.15,
+                "h": 0.3
+              },
+              {
+                "label": "Jack's mum face",
+                "x": 0.7,
+                "y": 0.3,
+                "w": 0.15,
+                "h": 0.3
+              },
+              {
+                "label": "Magic hen face",
+                "x": 0.1,
+                "y": 0.4,
+                "w": 0.2,
+                "h": 0.3
+              },
+              {
+                "label": "Golden egg",
+                "x": 0.25,
+                "y": 0.65,
+                "w": 0.1,
+                "h": 0.1
+              }
+            ]
+          }
+        },
+        "20": {
+          "file": "jack/scene-20.jpg",
+          "analysis": {
+            "hero_visible": true,
+            "likeness": 9,
+            "scene_match": 9,
+            "defects": [],
+            "important": [
+              {
+                "label": "Jack face",
+                "x": 0.38,
+                "y": 0.45,
+                "w": 0.1,
+                "h": 0.15
+              },
+              {
+                "label": "Jack's mother face",
+                "x": 0.53,
+                "y": 0.4,
+                "w": 0.12,
+                "h": 0.18
+              },
+              {
+                "label": "Milky-White (white cow)",
+                "x": 0.15,
+                "y": 0.4,
+                "w": 0.25,
+                "h": 0.4
+              },
+              {
+                "label": "Magic hen",
+                "x": 0.7,
+                "y": 0.7,
+                "w": 0.15,
+                "h": 0.2
+              },
+              {
+                "label": "Cottage",
+                "x": 0.3,
+                "y": 0.3,
+                "w": 0.5,
+                "h": 0.6
+              }
+            ]
+          }
+        }
+      }
+    },
+    "red": {
+      "bible": {
+        "grandma": {
+          "file": "red/bible-grandma.jpg",
+          "description": "Grandma: a small, cheerful old woman with white hair in a bun, round spectacles, a lilac nightgown and a frilly white nightcap."
+        },
+        "woodcutter": {
+          "file": "red/bible-woodcutter.jpg",
+          "description": "The woodcutter: a tall, friendly woodcutter with a short brown beard, a red-and-black checked shirt and an axe on his shoulder."
+        },
+        "hero": {
+          "file": "red/bible-hero.jpg",
+          "description": "Little Red Riding Hood (stand-in, replaced by the child in every book)"
+        },
+        "wolf": {
+          "file": "red/bible-wolf.jpg",
+          "description": "The wolf: a lanky grey wolf with a sly grin and yellow eyes, cartoonish and mischievous rather than frightening."
+        },
+        "mother": {
+          "file": "red/bible-mother.jpg",
+          "description": "Red's mum: a friendly adult village woman with a warm smile, auburn hair tied back, a green dress and a white apron."
+        }
+      },
+      "scenes": {
+        "1": {
+          "file": "red/scene-01.jpg",
+          "analysis": {
+            "hero_visible": true,
+            "likeness": 9,
+            "scene_match": 10,
+            "defects": [],
+            "important": [
+              {
+                "label": "Little Red Riding Hood face",
+                "x": 0.44,
+                "y": 0.48,
+                "w": 0.12,
+                "h": 0.18
+              },
+              {
+                "label": "Little Red Riding Hood body",
+                "x": 0.42,
+                "y": 0.48,
+                "w": 0.15,
+                "h": 0.35
+              },
+              {
+                "label": "Mother face",
+                "x": 0.62,
+                "y": 0.35,
+                "w": 0.12,
+                "h": 0.18
+              },
+              {
+                "label": "Mother body",
+                "x": 0.6,
+                "y": 0.35,
+                "w": 0.15,
+                "h": 0.45
+              },
+              {
+                "label": "Cottage",
+                "x": 0.05,
+                "y": 0.25,
+                "w": 0.35,
+                "h": 0.5
+              },
+              {
+                "label": "Flower garden",
+                "x": 0,
+                "y": 0.7,
+                "w": 0.4,
+                "h": 0.3
+              },
+              {
+                "label": "Forest",
+                "x": 0.4,
+                "y": 0,
+                "w": 0.6,
+                "h": 0.7
+              },
+              {
+                "label": "Gate",
+                "x": 0.4,
+                "y": 0.65,
+                "w": 0.15,
+                "h": 0.25
+              }
+            ]
+          }
+        },
+        "2": {
+          "file": "red/scene-02.jpg",
+          "analysis": {
+            "hero_visible": true,
+            "likeness": 9,
+            "scene_match": 10,
+            "defects": [],
+            "important": [
+              {
+                "label": "Little Red Riding Hood face",
+                "x": 0.05,
+                "y": 0.3,
+                "w": 0.25,
+                "h": 0.4
+              },
+              {
+                "label": "Mother face",
+                "x": 0.55,
+                "y": 0.3,
+                "w": 0.3,
+                "h": 0.45
+              },
+              {
+                "label": "Wicker basket with checked cloth",
+                "x": 0.35,
+                "y": 0.5,
+                "w": 0.3,
+                "h": 0.25
+              }
+            ]
+          }
+        },
+        "3": {
+          "file": "red/scene-03.jpg",
+          "analysis": {
+            "hero_visible": true,
+            "likeness": 9,
+            "scene_match": 9,
+            "defects": [],
+            "important": [
+              {
+                "label": "Little Red Riding Hood face",
+                "x": 0.55,
+                "y": 0.25,
+                "w": 0.25,
+                "h": 0.4
+              },
+              {
+                "label": "Little Red Riding Hood waving hand",
+                "x": 0.55,
+                "y": 0.25,
+                "w": 0.2,
+                "h": 0.3
+              },
+              {
+                "label": "Mother face at cottage door",
+                "x": 0.1,
+                "y": 0.3,
+                "w": 0.15,
+                "h": 0.3
+              },
+              {
+                "label": "Cottage door",
+                "x": 0.05,
+                "y": 0.25,
+                "w": 0.2,
+                "h": 0.5
+              },
+              {
+                "label": "Winding forest path",
+                "x": 0.3,
+                "y": 0.5,
+                "w": 0.6,
+                "h": 0.4
+              }
+            ]
+          }
+        },
+        "4": {
+          "file": "red/scene-04.jpg",
+          "analysis": {
+            "hero_visible": true,
+            "likeness": 9,
+            "scene_match": 9,
+            "defects": [],
+            "important": [
+              {
+                "label": "Little Red Riding Hood face",
+                "x": 0.15,
+                "y": 0.15,
+                "w": 0.3,
+                "h": 0.3
+              },
+              {
+                "label": "basket with bread and honey cake",
+                "x": 0.3,
+                "y": 0.5,
+                "w": 0.4,
+                "h": 0.3
+              }
+            ]
+          }
+        },
+        "5": {
+          "file": "red/scene-05.jpg",
+          "analysis": {
+            "hero_visible": true,
+            "likeness": 9,
+            "scene_match": 9,
+            "defects": [],
+            "important": [
+              {
+                "label": "Little Red Riding Hood face",
+                "x": 0.46,
+                "y": 0.55,
+                "w": 0.08,
+                "h": 0.12
+              },
+              {
+                "label": "Little Red Riding Hood body",
+                "x": 0.44,
+                "y": 0.55,
+                "w": 0.12,
+                "h": 0.25
+              },
+              {
+                "label": "forest path",
+                "x": 0.3,
+                "y": 0.5,
+                "w": 0.4,
+                "h": 0.5
+              },
+              {
+                "label": "tall trees",
+                "x": 0.1,
+                "y": 0.1,
+                "w": 0.8,
+                "h": 0.8
+              }
+            ]
+          }
+        },
+        "6": {
+          "file": "red/scene-06.jpg",
+          "analysis": {
+            "hero_visible": true,
+            "likeness": 9,
+            "scene_match": 10,
+            "defects": [],
+            "important": [
+              {
+                "label": "Little Red Riding Hood face",
+                "x": 0.05,
+                "y": 0.2,
+                "w": 0.2,
+                "h": 0.4
+              },
+              {
+                "label": "Wolf face",
+                "x": 0.65,
+                "y": 0.25,
+                "w": 0.25,
+                "h": 0.5
+              }
+            ]
+          }
+        },
+        "7": {
+          "file": "red/scene-07.jpg",
+          "analysis": {
+            "hero_visible": true,
+            "likeness": 9,
+            "scene_match": 9,
+            "defects": [],
+            "important": [
+              {
+                "label": "Little Red Riding Hood face",
+                "x": 0.05,
+                "y": 0.2,
+                "w": 0.25,
+                "h": 0.4
+              },
+              {
+                "label": "Little Red Riding Hood pointing hand",
+                "x": 0.25,
+                "y": 0.5,
+                "w": 0.15,
+                "h": 0.15
+              },
+              {
+                "label": "Wolf face",
+                "x": 0.65,
+                "y": 0.2,
+                "w": 0.3,
+                "h": 0.5
+              },
+              {
+                "label": "Path",
+                "x": 0.35,
+                "y": 0.6,
+                "w": 0.3,
+                "h": 0.3
+              }
+            ]
+          }
+        },
+        "8": {
+          "file": "red/scene-08.jpg",
+          "analysis": {
+            "hero_visible": true,
+            "likeness": 9,
+            "scene_match": 10,
+            "defects": [],
+            "important": [
+              {
+                "label": "Little Red Riding Hood face",
+                "x": 0.15,
+                "y": 0.3,
+                "w": 0.2,
+                "h": 0.3
+              },
+              {
+                "label": "Little Red Riding Hood body",
+                "x": 0.1,
+                "y": 0.4,
+                "w": 0.3,
+                "h": 0.5
+              },
+              {
+                "label": "Wolf",
+                "x": 0.65,
+                "y": 0.3,
+                "w": 0.25,
+                "h": 0.4
+              },
+              {
+                "label": "Wildflowers meadow",
+                "x": 0,
+                "y": 0.6,
+                "w": 0.7,
+                "h": 0.4
+              }
+            ]
+          }
+        },
+        "9": {
+          "file": "red/scene-09.jpg",
+          "analysis": {
+            "hero_visible": true,
+            "likeness": 9,
+            "scene_match": 9,
+            "defects": [],
+            "important": [
+              {
+                "label": "Little Red Riding Hood face",
+                "x": 0.12,
+                "y": 0.55,
+                "w": 0.12,
+                "h": 0.25
+              },
+              {
+                "label": "Wolf face",
+                "x": 0.65,
+                "y": 0.35,
+                "w": 0.25,
+                "h": 0.45
+              },
+              {
+                "label": "Grandma's cottage",
+                "x": 0.55,
+                "y": 0.3,
+                "w": 0.4,
+                "h": 0.5
+              }
+            ]
+          }
+        },
+        "10": {
+          "file": "red/scene-10.jpg",
+          "analysis": {
+            "hero_visible": true,
+            "likeness": 9,
+            "scene_match": 10,
+            "defects": [],
+            "important": [
+              {
+                "label": "Little Red Riding Hood face",
+                "x": 0.05,
+                "y": 0.45,
+                "w": 0.15,
+                "h": 0.35
+              },
+              {
+                "label": "Little Red Riding Hood figure outside window",
+                "x": 0.15,
+                "y": 0.05,
+                "w": 0.1,
+                "h": 0.3
+              },
+              {
+                "label": "Wolf in bed wearing nightcap",
+                "x": 0.45,
+                "y": 0.4,
+                "w": 0.25,
+                "h": 0.35
+              },
+              {
+                "label": "Grandma peeking from wardrobe",
+                "x": 0.75,
+                "y": 0.35,
+                "w": 0.2,
+                "h": 0.5
+              },
+              {
+                "label": "Wardrobe",
+                "x": 0.7,
+                "y": 0.3,
+                "w": 0.25,
+                "h": 0.6
+              },
+              {
+                "label": "Bed",
+                "x": 0.4,
+                "y": 0.4,
+                "w": 0.3,
+                "h": 0.4
+              },
+              {
+                "label": "Window",
+                "x": 0.1,
+                "y": 0.05,
+                "w": 0.2,
+                "h": 0.35
+              }
+            ]
+          }
+        },
+        "11": {
+          "file": "red/scene-11.jpg",
+          "analysis": {
+            "hero_visible": true,
+            "likeness": 9,
+            "scene_match": 9,
+            "defects": [],
+            "important": [
+              {
+                "label": "Little Red Riding Hood face",
+                "x": 0.3,
+                "y": 0.2,
+                "w": 0.25,
+                "h": 0.35
+              },
+              {
+                "label": "basket with flowers",
+                "x": 0.25,
+                "y": 0.55,
+                "w": 0.2,
+                "h": 0.2
+              },
+              {
+                "label": "front door",
+                "x": 0.5,
+                "y": 0.15,
+                "w": 0.45,
+                "h": 0.7
+              }
+            ]
+          }
+        },
+        "12": {
+          "file": "red/scene-12.jpg",
+          "analysis": {
+            "hero_visible": true,
+            "likeness": 9,
+            "scene_match": 9,
+            "defects": [],
+            "important": [
+              {
+                "label": "Little Red Riding Hood face",
+                "x": 0.05,
+                "y": 0.3,
+                "w": 0.25,
+                "h": 0.5
+              },
+              {
+                "label": "Wolf face with nightcap",
+                "x": 0.55,
+                "y": 0.25,
+                "w": 0.35,
+                "h": 0.6
+              },
+              {
+                "label": "Bed with pillow and blanket",
+                "x": 0.45,
+                "y": 0.3,
+                "w": 0.5,
+                "h": 0.6
+              }
+            ]
+          }
+        },
+        "13": {
+          "file": "red/scene-13.jpg",
+          "analysis": {
+            "hero_visible": true,
+            "likeness": 9,
+            "scene_match": 10,
+            "defects": [],
+            "important": [
+              {
+                "label": "Little Red Riding Hood face",
+                "x": 0.05,
+                "y": 0.25,
+                "w": 0.3,
+                "h": 0.5
+              },
+              {
+                "label": "Wolf face with nightcap",
+                "x": 0.5,
+                "y": 0.3,
+                "w": 0.45,
+                "h": 0.5
+              }
+            ]
+          }
+        },
+        "14": {
+          "file": "red/scene-14.jpg",
+          "analysis": {
+            "hero_visible": true,
+            "likeness": 9,
+            "scene_match": 9,
+            "defects": [],
+            "important": [
+              {
+                "label": "Little Red Riding Hood face",
+                "x": 0.05,
+                "y": 0.25,
+                "w": 0.35,
+                "h": 0.5
+              },
+              {
+                "label": "Wolf face with nightcap and big teeth",
+                "x": 0.5,
+                "y": 0.15,
+                "w": 0.45,
+                "h": 0.7
+              }
+            ]
+          }
+        },
+        "15": {
+          "file": "red/scene-15.jpg",
+          "analysis": {
+            "hero_visible": true,
+            "likeness": 9,
+            "scene_match": 9,
+            "defects": [],
+            "important": [
+              {
+                "label": "Little Red Riding Hood face",
+                "x": 0.55,
+                "y": 0.25,
+                "w": 0.15,
+                "h": 0.25
+              },
+              {
+                "label": "Little Red Riding Hood cape",
+                "x": 0.55,
+                "y": 0.3,
+                "w": 0.3,
+                "h": 0.3
+              },
+              {
+                "label": "Wolf face",
+                "x": 0.15,
+                "y": 0.3,
+                "w": 0.2,
+                "h": 0.3
+              },
+              {
+                "label": "Wolf tangled in nightgown",
+                "x": 0.1,
+                "y": 0.3,
+                "w": 0.3,
+                "h": 0.4
+              },
+              {
+                "label": "Grandma's cottage door",
+                "x": 0.05,
+                "y": 0.2,
+                "w": 0.2,
+                "h": 0.5
+              }
+            ]
+          }
+        },
+        "16": {
+          "file": "red/scene-16.jpg",
+          "analysis": {
+            "hero_visible": true,
+            "likeness": 9,
+            "scene_match": 9,
+            "defects": [],
+            "important": [
+              {
+                "label": "Little Red Riding Hood face",
+                "x": 0.05,
+                "y": 0.3,
+                "w": 0.15,
+                "h": 0.25
+              },
+              {
+                "label": "Little Red Riding Hood head and hood",
+                "x": 0.03,
+                "y": 0.25,
+                "w": 0.2,
+                "h": 0.35
+              },
+              {
+                "label": "Woodcutter face",
+                "x": 0.6,
+                "y": 0.3,
+                "w": 0.15,
+                "h": 0.25
+              },
+              {
+                "label": "Woodcutter head and axe",
+                "x": 0.55,
+                "y": 0.25,
+                "w": 0.3,
+                "h": 0.4
+              },
+              {
+                "label": "Cottage in background",
+                "x": 0.4,
+                "y": 0.4,
+                "w": 0.15,
+                "h": 0.15
+              }
+            ]
+          }
+        },
+        "17": {
+          "file": "red/scene-17.jpg",
+          "analysis": {
+            "hero_visible": true,
+            "likeness": 10,
+            "scene_match": 9,
+            "defects": [],
+            "important": [
+              {
+                "label": "Little Red Riding Hood face",
+                "x": 0.05,
+                "y": 0.15,
+                "w": 0.2,
+                "h": 0.4
+              },
+              {
+                "label": "Little Red Riding Hood head",
+                "x": 0.05,
+                "y": 0.15,
+                "w": 0.2,
+                "h": 0.4
+              },
+              {
+                "label": "Woodcutter face",
+                "x": 0.5,
+                "y": 0.3,
+                "w": 0.15,
+                "h": 0.3
+              },
+              {
+                "label": "Woodcutter head",
+                "x": 0.5,
+                "y": 0.3,
+                "w": 0.15,
+                "h": 0.3
+              },
+              {
+                "label": "Wolf face",
+                "x": 0.7,
+                "y": 0.4,
+                "w": 0.15,
+                "h": 0.2
+              },
+              {
+                "label": "Wolf head",
+                "x": 0.7,
+                "y": 0.4,
+                "w": 0.15,
+                "h": 0.2
+              },
+              {
+                "label": "Cottage door",
+                "x": 0,
+                "y": 0,
+                "w": 0.3,
+                "h": 0.7
+              }
+            ]
+          }
+        },
+        "18": {
+          "file": "red/scene-18.jpg",
+          "analysis": null
+        },
+        "19": {
+          "file": "red/scene-19.jpg",
+          "analysis": {
+            "hero_visible": true,
+            "likeness": 9,
+            "scene_match": 9,
+            "defects": [],
+            "important": [
+              {
+                "label": "Little Red Riding Hood face",
+                "x": 0.05,
+                "y": 0.3,
+                "w": 0.2,
+                "h": 0.4
+              },
+              {
+                "label": "Grandma face",
+                "x": 0.35,
+                "y": 0.3,
+                "w": 0.2,
+                "h": 0.4
+              },
+              {
+                "label": "Woodcutter face",
+                "x": 0.65,
+                "y": 0.3,
+                "w": 0.2,
+                "h": 0.4
+              },
+              {
+                "label": "Bread",
+                "x": 0.5,
+                "y": 0.6,
+                "w": 0.3,
+                "h": 0.2
+              },
+              {
+                "label": "Honey jar",
+                "x": 0.3,
+                "y": 0.6,
+                "w": 0.1,
+                "h": 0.15
+              },
+              {
+                "label": "Table",
+                "x": 0,
+                "y": 0.55,
+                "w": 1,
+                "h": 0.45
+              }
+            ]
+          }
+        },
+        "20": {
+          "file": "red/scene-20.jpg",
+          "analysis": {
+            "hero_visible": true,
+            "likeness": 9,
+            "scene_match": 10,
+            "defects": [],
+            "important": [
+              {
+                "label": "Little Red Riding Hood face",
+                "x": 0.15,
+                "y": 0.35,
+                "w": 0.15,
+                "h": 0.25
+              },
+              {
+                "label": "Little Red Riding Hood head and hood",
+                "x": 0.12,
+                "y": 0.3,
+                "w": 0.22,
+                "h": 0.35
+              },
+              {
+                "label": "Mother face",
+                "x": 0.7,
+                "y": 0.3,
+                "w": 0.15,
+                "h": 0.25
+              },
+              {
+                "label": "Mother head",
+                "x": 0.68,
+                "y": 0.28,
+                "w": 0.18,
+                "h": 0.3
+              },
+              {
+                "label": "Forest path",
+                "x": 0,
+                "y": 0.5,
+                "w": 0.5,
+                "h": 0.5
+              },
+              {
+                "label": "Cottage gate",
+                "x": 0.6,
+                "y": 0.5,
+                "w": 0.25,
+                "h": 0.4
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "version": "2026-11-18T21:49:40.917Z"
+}
