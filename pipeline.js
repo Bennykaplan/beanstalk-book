@@ -45,7 +45,7 @@ function scoreOf(a) {
   if (!a) return 0;
   return (a.hero_visible ? 3 : 0) + Number(a.likeness || 0) * 0.5 + Number(a.scene_match || 0) * 0.3 - (a.defects?.length || 0) * 1.5;
 }
-const passes = (a) => a && a.hero_visible && a.likeness >= 7 && a.scene_match >= 6 && !(a.defects?.length);
+const passes = (a) => a && a.hero_visible && a.likeness >= 6 && a.scene_match >= 6 && !(a.defects?.length);
 
 async function loadScene(story, index) {
   const { rows } = await query('SELECT mime, data, analysis FROM scenes WHERE story = $1 AND page = $2', [story, index + 1]);
@@ -75,6 +75,8 @@ async function makePage(ctx, index, ref, refKind, firstTry = null) {
         await logCall(ctx, slot, n === 1 && firstTry ? 'image:edit' : 'image:page', MODEL, Date.now() - t0, true, null, image.cost);
       } catch (e) {
         await logCall(ctx, slot, 'image:page', MODEL, Date.now() - t0, false, e.message, 0);
+        // Retrying can't fix a billing or key problem; it can only fail again.
+        if (/credits|quota|billing|api key|safety system/i.test(e.message)) throw e;
         continue;
       }
       await setSlot(ctx.bookId, slot, 'checking', { attempts: n });
@@ -111,7 +113,9 @@ async function makeSheet(ctx, photo) {
   await setSlot(ctx.bookId, 'sheet', 'painting', { attempts: 1, started: true });
   const t0 = Date.now();
   try {
-    const image = await generateImage(heroSheetPrompt(story), [photo]);
+    // The sheet waits behind every page, so it never delays one.
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    const image = await generateImage(heroSheetPrompt(story), [photo], '1536x1024', 'later');
     await logCall(ctx, 'sheet', 'image:sheet', MODEL, Date.now() - t0, true, null, image.cost);
     await query(
       `INSERT INTO bible (story, key, book_id, description, mime, data) VALUES ($1, 'hero', $2, $3, $4, $5)

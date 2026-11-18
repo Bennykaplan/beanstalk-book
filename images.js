@@ -5,7 +5,10 @@ import sharp from 'sharp';
 import { imageCost, chatCost } from './costs.js';
 
 export const MODEL = process.env.OPENAI_IMAGE_MODEL || 'gpt-image-1.5';
-export const QUALITY = process.env.OPENAI_IMAGE_QUALITY || 'medium';
+// Low quality and low input fidelity: tested side by side, the likeness holds, and a page costs
+// about 2.5 cents and 9 seconds instead of 15 cents and 20 seconds. See PRICING.md.
+export const QUALITY = process.env.OPENAI_IMAGE_QUALITY || 'low';
+const FIDELITY = process.env.OPENAI_INPUT_FIDELITY || 'low';
 export const ANALYSIS_MODEL = process.env.ANALYSIS_MODEL || 'gpt-4.1-mini';
 export const MOCK = process.env.IMAGE_PROVIDER === 'mock';
 const MOCK_FAIL_RATE = Number(process.env.MOCK_FAIL_RATE || 0);
@@ -13,22 +16,23 @@ const MOCK_FAIL_RATE = Number(process.env.MOCK_FAIL_RATE || 0);
 // OpenAI caps image calls per minute by account level (20 a minute at the lowest paid level).
 // Calls wait for a free spot instead of failing with a rate-limit error.
 const PER_MINUTE = Number(process.env.IMAGES_PER_MINUTE || 20);
+// Pages go first; a book's character sheet only takes a spot no page is waiting for.
 const started = [];
-const waiting = [];
+const waiting = { page: [], later: [] };
 
 function release() {
   const now = Date.now();
   while (started.length && now - started[0] >= 60_000) started.shift();
-  while (waiting.length && started.length < PER_MINUTE) {
+  while ((waiting.page.length || waiting.later.length) && started.length < PER_MINUTE) {
     started.push(Date.now());
-    waiting.shift()();
+    (waiting.page.shift() || waiting.later.shift())();
   }
-  if (waiting.length) setTimeout(release, 60_000 - (now - started[0]) + 50);
+  if (waiting.page.length || waiting.later.length) setTimeout(release, 60_000 - (now - started[0]) + 50);
 }
 
-function imageTurn() {
+function imageTurn(priority = 'page') {
   return new Promise((resolve) => {
-    waiting.push(resolve);
+    waiting[priority].push(resolve);
     release();
   });
 }
@@ -50,8 +54,8 @@ export async function generateFromText(prompt, size = '1024x1024') {
 }
 
 // images: [{ mime, data: Buffer }]. Returns { mime, data, cost }.
-export async function generateImage(prompt, images, size = '1536x1024') {
-  await imageTurn();
+export async function generateImage(prompt, images, size = '1536x1024', priority = 'page') {
+  await imageTurn(priority);
   if (MOCK) {
     await sleep(800 + Math.random() * 1500);
     return { ...images[0], cost: 0 };
@@ -63,7 +67,7 @@ export async function generateImage(prompt, images, size = '1536x1024') {
   form.append('quality', QUALITY);
   form.append('output_format', 'jpeg');
   form.append('output_compression', '90');
-  if (MODEL === 'gpt-image-1.5') form.append('input_fidelity', 'high'); // keeps the reference face
+  if (MODEL === 'gpt-image-1.5') form.append('input_fidelity', FIDELITY);
   images.forEach((img, i) => {
     form.append('image[]', new Blob([img.data], { type: img.mime }), `ref${i}.${img.mime.split('/')[1]}`);
   });

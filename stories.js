@@ -57,7 +57,7 @@ export const STORIES = {
       { text: 'Jack went to bed hungry, and the moon rose over the garden.', cast: [], scene: 'A tiny attic bedroom at night, moonlight through a round window. Jack sits in his small bed hugging his knees, sad but hopeful.' },
       { text: 'In the morning, a giant beanstalk had grown right up into the clouds.', cast: [], scene: 'Dawn in the garden. An enormous twisting green beanstalk rises from the soil up into pink clouds. Jack stands at its base in his nightshirt-free day clothes, mouth open in wonder.' },
       { text: 'Up and up Jack climbed, past the birds and into the clouds.', cast: [], scene: 'Jack climbs the giant beanstalk high above the countryside, small birds flying past, fields far below.' },
-      { text: 'At the very top stood a castle as big as a mountain.', cast: [], scene: 'Jack stands on a path made of clouds, looking up at a gigantic stone castle with huge doors.' },
+      { text: 'At the very top stood a castle as big as a mountain.', cast: [], scene: 'Jack stands on a path made of clouds in front of a gigantic stone castle with huge doors, turned three-quarters toward the viewer so his amazed face is clearly visible as he glances up at it.' },
       { text: 'A giant woman opened the door. "Quick, hide! My husband is coming, and he is grumpy!"', cast: ['giantWife'], scene: "In the castle's enormous doorway the kind giantess bends down toward tiny Jack, finger to her lips." },
       { text: 'Thump! Thump! "Fee-fi-fo-fum!" roared the giant.', cast: ['giant'], scene: "A huge castle kitchen. Jack peeks out from behind a giant copper pot while the comic giant stomps in, sniffing the air." },
       { text: 'The giant counted his gold until he fell fast asleep.', cast: ['giant'], scene: 'The giant snores in a huge chair beside a table piled with gold coins. Jack tiptoes along the edge of the table, wide-eyed.' },
@@ -66,7 +66,7 @@ export const STORIES = {
       { text: 'The hen squawked, and the giant woke up!', cast: ['giant', 'hen'], scene: 'Jack runs across the giant floor holding the squawking hen; behind him the giant jolts awake in his chair.' },
       { text: 'Down the beanstalk Jack raced, with the giant thundering behind.', cast: ['giant', 'hen'], scene: 'Jack slides and scrambles down the beanstalk holding the hen; far above, the giant climbs down after him.' },
       { text: '"Mother, the axe!" Jack chopped and chopped.', cast: ['mother'], scene: 'At the bottom of the beanstalk in the garden, Jack swings a small axe at the thick stalk while his mother runs toward him.' },
-      { text: 'Down came the beanstalk, and the giant was never seen again.', cast: ['mother'], scene: 'The cut beanstalk topples sideways into the distance with a huge crash and a puff of leaves; Jack and his mother watch, safe.' },
+      { text: 'Down came the beanstalk, and the giant was never seen again.', cast: ['mother'], scene: 'Jack and his mother stand in the garden in the foreground, facing the viewer with relieved faces clearly visible, as behind them the cut beanstalk topples into the distance with a huge crash and a puff of leaves.' },
       { text: 'Every morning the hen laid a golden egg, and nobody went hungry again.', cast: ['mother', 'hen'], scene: 'The cottage kitchen, now warm and full of food. The hen sits on the table with a golden egg; Jack and his mother smile.' },
       { text: 'And Jack and his mother lived happily ever after.', cast: ['mother', 'cow', 'hen'], scene: 'The cottage, now cheerful and tidy, at sunset. Jack and his mother wave from the garden; a new white cow and the hen are nearby.' },
     ],
@@ -111,7 +111,7 @@ export const STORIES = {
 const IDENTITY =
   'Identity is the top priority: the face must be recognizably the person in the photo. Preserve face shape and width, ' +
   'eye shape, spacing and color, eyebrows, nose, mouth, ears, hairline, hairstyle, hair length, color and texture, skin tone, ' +
-  'freckles, moles, glasses and hair accessories (headbands, clips, bows) if any. ' +
+  'freckles and moles. Glasses, headbands, clips or bows only if the reference shows them: never add glasses or accessories that are not there. ' +
   'Keep their apparent age and never make them look younger: a child stays a child of the same age with realistic proportions, ' +
   'and an adult is drawn as an adult. Do not beautify or swap features.';
 
@@ -194,23 +194,27 @@ export function editPrompt(story, instruction) {
   ].join('\n\n');
 }
 
-// Vision check of a finished page. refs: [page, character sheet]
+// Vision check of a finished page. refs: [page, reference of the child]
 export function analysisPrompt(story, index, ref = 'photo') {
   const page = story.pages[index];
-  const what = ref === 'photo' ? 'a photo of the child' : 'the character sheet of the child';
+  const what = ref === 'photo' ? 'a real photo of the child' : 'the character sheet of the child';
   const others = page.cast.map((key) => story.cast[key].split(':')[0]).join(', ') || 'nobody else';
-  return `You check one illustrated page of a children's picture book before it is printed. Image 1 is the page. Image 2 is ${what} who plays ${story.hero}.
-The page's words (drawn later, not in the image) are: "${page.text}"
+  return `You check one illustrated page of a children's picture book before it is printed. Image 1 is the page. Image 2 is ${what} who plays ${story.hero} (the hero can be any gender, and the costume is the story's).
+The page's words (printed later, not in the image) are: "${page.text}"
 Scene it should show: ${page.scene}
 Other characters who should appear: ${others}.
 
-Judge strictly and only by what you can see. Return JSON:
+How to judge likeness: the page is a stylized 3D cartoon, so the hero is drawn as a cartoon child with big eyes even if image 2 shows an adult. That is expected. Judge only whether the features that identify the person carried over: hair color, hair length and style, skin tone, face shape, glasses or accessories. 8-10: clearly the same person as a cartoon. 5-7: some identifying features carried over. 0-4: looks like a different person.
+
+Defects are only serious problems a parent would notice: letters or words drawn in the picture, extra or missing arms, legs or fingers, a melted or distorted face, the hero shown twice, the hero missing or facing away, or a named character missing. Small differences from the scene description are not defects; reflect them in scene_match instead.
+
+Return JSON:
 {
-  "hero_visible": true/false,          // ${story.hero} is in the picture with the face visible
-  "likeness": 0-10,                    // how clearly the face matches image 2 (hair, glasses, skin tone, face shape)
-  "scene_match": 0-10,                 // how well the picture shows the scene and words
-  "defects": ["..."],                  // drawn text or letters, extra or missing limbs or fingers, melted faces, duplicate heroes, wrong number of key objects
+  "hero_visible": true/false,
+  "likeness": 0-10,
+  "scene_match": 0-10,
+  "defects": ["..."],
   "important": [{"label": "...", "x": 0-1, "y": 0-1, "w": 0-1, "h": 0-1}]
 }
-"important" lists the bounding box (fractions of image width and height, x/y = top-left corner) of every face, every character's head, and every object the words or scene depend on. Words will be printed on the page, and they must never cover anything in this list.`;
+"important" lists the bounding box (fractions of image width and height, x/y = top-left corner) of every face, every character's head, and every object the words depend on. Words will be printed on the page and must never cover anything in this list.`;
 }
