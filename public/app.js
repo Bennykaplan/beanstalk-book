@@ -221,6 +221,10 @@ async function bookView(id) {
         <span class="small muted" id="cost"></span>
         <button class="link danger" id="del" style="margin-left:auto">Delete book</button>
       </div>
+      <div class="card stack" id="bibleCard" hidden>
+        <div class="actions" style="justify-content:space-between"><h2 style="margin:0">Character bible</h2><span class="small muted">Stored once per story and edited into every page; your hero is added when the book is made.</span></div>
+        <div class="bible" id="bible"></div>
+      </div>
       <div class="card stack">
         <h2>About Me (back cover)</h2>
         <div class="row" id="aboutForm">${aboutForm(book.about)}</div>
@@ -246,13 +250,21 @@ async function bookView(id) {
     }
   };
   view.querySelectorAll('.tile').forEach((t) => { t.onclick = () => openPage(book, t.dataset.slot, () => poll(true)); });
+  let bibleShown = 0;
+  async function showBible() {
+    const cast = await api(`/api/books/${id}/bible`);
+    if (cast.length === bibleShown) return;
+    bibleShown = cast.length;
+    $('#bible').innerHTML = cast.map((c) => `<figure><img alt="${esc(c.name)}" loading="lazy" src="${c.url}?v=${book.readyMs || 0}"><figcaption>${esc(c.own ? `${book.hero}: ${book.about.name}` : c.name)}</figcaption></figure>`).join('');
+    $('#bibleCard').hidden = false;
+  }
 
   function render() {
     const pages = book.pages.map((p) => book.slots[p.slot]);
     const painted = pages.filter((s) => s && (s.hasImage || ['checking', 'retrying'].includes(s.status))).length;
     const checked = pages.filter((s) => s?.status === 'done').length;
     const failed = pages.filter((s) => s?.status === 'error').length;
-    const busy = pages.some((s) => s && BUSY.includes(s.status)) || BUSY.includes(book.slots.sheet?.status);
+    const busy = pages.some((s) => s && BUSY.includes(s.status)) || book.stage === 'finishing';
     const ready = book.stage === 'ready';
     const stageIdx = ready ? 4 : checked === 20 ? 3 : painted === 20 ? 2 : 1;
     $('#progress').hidden = ready && !state.justMade;
@@ -279,6 +291,7 @@ async function bookView(id) {
     }
     $('#pdf').classList.toggle('off', !ready);
     $('#print').disabled = !ready;
+    if (!busy) showBible().catch(() => {});
     $('#cost').textContent = book.cost.usd ? `This book cost ${usd(book.cost.usd)} in AI calls to make (${book.cost.images} images, ${book.cost.checks} checks).` : '';
     return busy;
   }

@@ -110,6 +110,9 @@
   .page.panel img { height: var(--art, 72%); }
   .page.panel .words { top: auto; bottom: 7%; color: #23311f; text-shadow: none; }
 
+  .bible { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); }
+  .bible figure { margin: 0; text-align: center; font-size: .8rem; color: var(--muted); }
+  .bible img { width: 100%; aspect-ratio: 3 / 4; object-fit: cover; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); }
   table { width: 100%; border-collapse: collapse; font-size: .93rem; }
   th, td { text-align: left; padding: 9px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
   th { color: var(--muted); font-weight: 600; font-size: .82rem; }

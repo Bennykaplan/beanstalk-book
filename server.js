@@ -133,8 +133,8 @@ const isBusy = (s) => s && BUSY.includes(s.status);
 function stageOf(book, slots) {
   if (!book.story) return 'legacy';
   const pages = PAGE_SLOTS.map((s) => slots[s]);
-  if (pages.some(isBusy) || isBusy(slots.sheet)) return pages.every((p) => p?.status === 'done') ? 'finishing' : 'painting';
-  if (pages.every((p) => p?.hasImage)) return 'ready';
+  if (pages.some(isBusy)) return 'painting';
+  if (pages.every((p) => p?.hasImage)) return book.stage === 'finishing' ? 'finishing' : 'ready';
   return pages.some((p) => p?.hasImage) ? 'partial' : 'failed';
 }
 
@@ -190,7 +190,7 @@ app.post('/api/books', handle(async (req) => {
     await query('DELETE FROM books WHERE id = $1', [ctx.bookId]);
     throw e;
   }
-  await Promise.all([...PAGE_SLOTS, 'sheet'].map((slot) => pipeline.setSlot(ctx.bookId, slot, 'queued')));
+  await Promise.all(PAGE_SLOTS.map((slot) => pipeline.setSlot(ctx.bookId, slot, 'queued')));
   log('book_created', { book: ctx.bookId, user: ctx.userId, story: story.id });
   // The photo is only ever in memory: it's used while the book is made and never stored.
   pipeline.runBook(ctx, photo).catch((e) => log('error', { where: 'runBook', book: ctx.bookId, error: e.message }));
@@ -243,6 +243,39 @@ app.post('/api/books/:id/slots/:slot/edit', handle((req) => {
   if (!instruction) throw new HttpError(400, 'Describe what to change.');
   return pageAction(req, (ctx, i) => pipeline.editPage(ctx, i, instruction));
 }));
+
+// The character bible: the story's shared characters, plus this book's hero.
+app.get('/api/books/:id/bible', handle(async (req) => {
+  const book = await ownedBook(req);
+  const { rows } = await query(
+    `SELECT key, description, book_id IS NOT NULL AS own FROM bible
+     WHERE story = $1 AND ((book_id IS NULL AND key <> 'hero') OR book_id = $2) ORDER BY book_id IS NULL, key`,
+    [book.story, book.id],
+  );
+  return rows.map((r) => ({ key: r.key, name: r.description.split(':')[0], own: r.own, url: r.own ? `/api/books/${book.id}/bible/hero.jpg` : `/api/bible/${book.story}/${r.key}.jpg` }));
+}));
+
+app.get('/api/books/:id/bible/hero.jpg', async (req, res) => {
+  try {
+    const book = await ownedBook(req);
+    const hero = await pipeline.loadBibleHero(book.id);
+    if (!hero) return res.status(404).end();
+    res.set({ 'Content-Type': hero.mime, 'Cache-Control': 'private, max-age=3600' }).send(hero.data);
+  } catch (e) {
+    res.status(e.status || 500).end();
+  }
+});
+
+const bibleThumbs = new Map();
+app.get('/api/bible/:story/:key.jpg', async (req, res) => {
+  const id = `${req.params.story}/${req.params.key}`;
+  if (!bibleThumbs.has(id)) {
+    const { rows } = await query("SELECT data FROM bible WHERE story = $1 AND key = $2 AND key <> 'hero' AND book_id IS NULL", [req.params.story, req.params.key]);
+    if (!rows[0]) return res.status(404).end();
+    bibleThumbs.set(id, await thumbnail(toBuffer(rows[0].data)));
+  }
+  res.set({ 'Content-Type': 'image/jpeg', 'Cache-Control': 'public, max-age=3600' }).send(bibleThumbs.get(id));
+});
 
 function sendImage(column) {
   return async (req, res) => {

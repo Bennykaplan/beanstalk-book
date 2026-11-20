@@ -117,9 +117,8 @@ function backCover(doc, book, x, w, h, safe) {
   const bx = x + safe + 20;
   const by = safe + 20;
   if (book.hero) {
-    // The sheet's left half is the full-body front view.
     doc.save().roundedRect(bx, by, boxW, boxH, 16).clip();
-    doc.image(book.hero, bx, by, { height: boxH, width: boxH * 1.5 });
+    doc.image(book.hero, bx, by, { cover: [boxW, boxH], align: 'center', valign: 'center' });
     doc.restore();
   }
   const tx = bx + boxW + 36;

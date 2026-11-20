@@ -171,7 +171,7 @@ export function scenePrompt(story, index) {
 // The reference is the uploaded photo while the book is first made, and the stored character
 // sheet for later re-makes (the photo itself is never stored).
 export function swapPrompt(story, ref = 'photo') {
-  const what = ref === 'photo' ? 'a photo of the child' : 'the character sheet of the child';
+  const what = ref === 'photo' ? 'a photo of the child' : 'a portrait of the child, from this book';
   return [
     STYLE,
     `Image 1 is a finished page from "${story.title}". Image 2 is ${what} who is ${story.hero} in this book.`,
@@ -187,7 +187,7 @@ export function swapPrompt(story, ref = 'photo') {
 export function editPrompt(story, instruction) {
   return [
     STYLE,
-    `Image 1 is a finished page from "${story.title}". Image 2 is the character sheet for ${story.hero}.`,
+    `Image 1 is a finished page from "${story.title}". Image 2 is a portrait of the child who plays ${story.hero}.`,
     `Edit image 1. Change only this: ${instruction}`,
     `Keep everything else exactly the same, including ${story.hero}'s face, which must match image 2.`,
     NO_TEXT,
@@ -197,7 +197,7 @@ export function editPrompt(story, instruction) {
 // Vision check of a finished page. refs: [page, reference of the child]
 export function analysisPrompt(story, index, ref = 'photo') {
   const page = story.pages[index];
-  const what = ref === 'photo' ? 'a real photo of the child' : 'the character sheet of the child';
+  const what = ref === 'photo' ? 'a real photo of the child' : 'a portrait of the child, from this book';
   const others = page.cast.map((key) => story.cast[key].split(':')[0]).join(', ') || 'nobody else';
   return `You check one illustrated page of a children's picture book before it is printed. Image 1 is the page. Image 2 is ${what} who plays ${story.hero} (the hero can be any gender, and the costume is the story's).
 The page's words (printed later, not in the image) are: "${page.text}"

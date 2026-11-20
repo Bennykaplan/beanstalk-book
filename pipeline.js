@@ -4,7 +4,8 @@
 // objects, so the words can be placed where they cover nothing.
 import { query, toBuffer } from './db.js';
 import { log } from './log.js';
-import { STORIES, TEMPLATE, heroSheetPrompt, swapPrompt, editPrompt, analysisPrompt } from './stories.js';
+import sharp from 'sharp';
+import { STORIES, TEMPLATE, swapPrompt, editPrompt, analysisPrompt } from './stories.js';
 import { generateImage, analyzeImage, thumbnail, MODEL, QUALITY, ANALYSIS_MODEL } from './images.js';
 import { placeText } from './layout.js';
 import { credit, BOOK_PRICE_CENTS } from './wallet.js';
@@ -108,52 +109,61 @@ async function makePage(ctx, index, ref, refKind, firstTry = null) {
   }
 }
 
-async function makeSheet(ctx, photo) {
+// The hero's entry in the character bible, for the About Me back cover and for re-making
+// pages later: a portrait cropped from the page where the check found the best likeness.
+// Cropping instead of drawing a separate character sheet keeps a book to exactly 20 image
+// calls, which fits in one minute of the account's image limit.
+async function saveHeroPortrait(ctx) {
   const story = STORIES[ctx.story];
-  await setSlot(ctx.bookId, 'sheet', 'painting', { attempts: 1, started: true });
-  const t0 = Date.now();
-  try {
-    // The sheet waits behind every page, so it never delays one.
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    const image = await generateImage(heroSheetPrompt(story), [photo], '1536x1024', 'later');
-    await logCall(ctx, 'sheet', 'image:sheet', MODEL, Date.now() - t0, true, null, image.cost);
+  const { rows } = await query(
+    "SELECT data, analysis FROM images WHERE book_id = $1 AND slot LIKE 'p%' AND data IS NOT NULL ORDER BY passed DESC NULLS LAST, score DESC NULLS LAST LIMIT 6",
+    [ctx.bookId],
+  );
+  const heroWords = new RegExp(`hero|child|${story.hero.split(' ').pop()}|kid|girl|boy|face`, 'i');
+  for (const row of rows) {
+    const boxes = (row.analysis?.important || []).filter((b) => b.w > 0.04 && b.h > 0.06);
+    const box = boxes.find((b) => heroWords.test(b.label || '')) || boxes.sort((p, q) => q.w * q.h - p.w * p.h)[0];
+    if (!box) continue;
+    const img = sharp(toBuffer(row.data));
+    const { width: W, height: H } = await img.metadata();
+    // A head box grows into a head-and-shoulders portrait, 3:4.
+    const h = Math.min(1, box.h * 2.6) * H;
+    const w = Math.min(W, h * 0.75);
+    const cx = (box.x + box.w / 2) * W;
+    const left = Math.round(Math.max(0, Math.min(W - w, cx - w / 2)));
+    const top = Math.round(Math.max(0, Math.min(H - h, box.y * H - box.h * H * 0.35)));
+    const data = await img.extract({ left, top, width: Math.round(w), height: Math.round(h) }).resize(600, 800, { fit: 'cover' }).jpeg({ quality: 88 }).toBuffer();
     await query(
-      `INSERT INTO bible (story, key, book_id, description, mime, data) VALUES ($1, 'hero', $2, $3, $4, $5)
-       ON CONFLICT (story, key, COALESCE(book_id, '00000000-0000-0000-0000-000000000000')) DO UPDATE SET mime = $4, data = $5, updated_at = now()`,
-      [ctx.story, ctx.bookId, `${story.hero}, played by the child in this book`, image.mime, image.data],
+      `INSERT INTO bible (story, key, book_id, description, mime, data) VALUES ($1, 'hero', $2, $3, 'image/jpeg', $4)
+       ON CONFLICT (story, key, COALESCE(book_id, '00000000-0000-0000-0000-000000000000')) DO UPDATE SET data = $4, updated_at = now()`,
+      [ctx.story, ctx.bookId, `${story.hero}, played by the child in this book`, data],
     );
-    await setSlot(ctx.bookId, 'sheet', 'done', { ...image, thumb: await thumbnail(image.data), attempts: 1 });
-    return image;
-  } catch (e) {
-    await logCall(ctx, 'sheet', 'image:sheet', MODEL, Date.now() - t0, false, e.message, 0);
-    await setSlot(ctx.bookId, 'sheet', 'error', { error: e.message });
-    return null;
+    return;
   }
+  log('error', { where: 'saveHeroPortrait', book: ctx.bookId, error: 'no hero box found' });
 }
 
 // The whole book. The photo lives only in this function's memory, for the length of the run.
 export async function runBook(ctx, photo) {
   const start = Date.now();
   await setStage(ctx.bookId, 'painting');
-  const pages = TEMPLATE.map((_, i) => makePage(ctx, i, photo, 'photo'));
-  const sheet = makeSheet(ctx, photo); // Queued after the pages, so it never slows them down.
-  const results = await Promise.all(pages);
+  const results = await Promise.all(TEMPLATE.map((_, i) => makePage(ctx, i, photo, 'photo')));
   await setStage(ctx.bookId, 'finishing');
-  await sheet;
   const made = results.filter(Boolean).length;
   if (made === 0) {
     await setStage(ctx.bookId, 'failed');
     await credit(ctx.userId, BOOK_PRICE_CENTS, 'Refund: book could not be made', { bookId: ctx.bookId });
     return;
   }
-  await setStage(ctx.bookId, made === TEMPLATE.length ? 'ready' : 'partial', ', ready_ms = $3'.replace('$3', String(Date.now() - start)));
+  await saveHeroPortrait(ctx).catch((e) => log('error', { where: 'saveHeroPortrait', book: ctx.bookId, error: e.message }));
+  await setStage(ctx.bookId, made === TEMPLATE.length ? 'ready' : 'partial', `, ready_ms = ${Date.now() - start}`);
   log('book_ready', { book: ctx.bookId, user: ctx.userId, ms: Date.now() - start, pages: made });
 }
 
-// Re-make one page later, from the stored character sheet.
+// Re-make one page later, from the hero's portrait in the character bible.
 export async function remakePage(ctx, index) {
   const hero = await loadBibleHero(ctx.bookId);
-  if (!hero) throw new Error('This book has no character sheet.');
+  if (!hero) throw new Error('This book has no portrait of its hero.');
   await makePage(ctx, index, hero, 'sheet');
 }
 
