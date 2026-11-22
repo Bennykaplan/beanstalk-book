@@ -412,7 +412,7 @@ async function walletView() {
             <td>${esc(KIND[h.kind] || h.kind)}<div class="small muted">${esc(h.description)}${h.book_id ? ` · <a href="#book/${h.book_id}">book</a>` : ''}${h.order_id ? ` · <a href="#order/${h.order_id}">order</a>` : ''}</div></td>
             <td class="small">${esc(h.status)}</td>
             <td class="amt ${h.amount_cents > 0 ? 'plus' : ''}">${h.amount_cents ? (h.amount_cents > 0 ? '+' : '') + money(h.amount_cents) : ''}</td>
-            <td>${h.kind === 'deposit' && h.status === 'completed' && h.refunded_cents < h.amount_cents ? `<button class="link" data-refund="${h.id}" data-max="${h.amount_cents - h.refunded_cents}">Refund</button>` : h.refunded_cents ? `<span class="small muted">${money(h.refunded_cents)} refunded</span>` : ''}</td>
+            <td>${h.kind === 'deposit' && h.status === 'completed' && h.refunded_cents < h.amount_cents && w.balanceCents > 0 ? `<button class="link" data-refund="${h.id}" data-max="${h.amount_cents - h.refunded_cents}">Refund</button>` : h.refunded_cents ? `<span class="small muted">${money(h.refunded_cents)} refunded</span>` : ''}</td>
           </tr>`).join('')}
         </tbody></table>` : '<p class="muted">Nothing yet. Add money to make your first book.</p>'}
       </div>
