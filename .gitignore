@@ -6,3 +6,5 @@ test-output-gemini/
 .localdb*/
 feedback-private/
 .localdb*/
+render.env
+review/
