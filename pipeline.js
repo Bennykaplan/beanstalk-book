@@ -7,7 +7,7 @@ import { log } from './log.js';
 import sharp from 'sharp';
 import { STORIES, TEMPLATE, swapPrompt, editPrompt, analysisPrompt } from './stories.js';
 import { generateImage, analyzeImage, thumbnail, MODEL, QUALITY, ANALYSIS_MODEL } from './images.js';
-import { placeText } from './layout.js';
+import { placeText, padHead } from './layout.js';
 import { credit, BOOK_PRICE_CENTS } from './wallet.js';
 
 export const MAX_TRIES = 3;
@@ -72,7 +72,7 @@ async function makePage(ctx, index, ref, refKind, firstTry = null) {
       let image;
       const t0 = Date.now();
       try {
-        image = n === 1 && firstTry ? await firstTry() : await generateImage(swapPrompt(story, refKind), [scene, ref]);
+        image = n === 1 && firstTry ? await firstTry() : await generateImage(swapPrompt(story, refKind, ctx.age), [scene, ref]);
         await logCall(ctx, slot, n === 1 && firstTry ? 'image:edit' : 'image:page', MODEL, Date.now() - t0, true, null, image.cost);
       } catch (e) {
         await logCall(ctx, slot, 'image:page', MODEL, Date.now() - t0, false, e.message, 0);
@@ -84,7 +84,7 @@ async function makePage(ctx, index, ref, refKind, firstTry = null) {
       let analysis = null;
       const t1 = Date.now();
       try {
-        const checked = await analyzeImage(analysisPrompt(story, index, refKind), [image, ref]);
+        const checked = await analyzeImage(analysisPrompt(story, index, refKind, ctx.age), [image, ref]);
         analysis = checked.result;
         await logCall(ctx, slot, 'check', ANALYSIS_MODEL, Date.now() - t1, true, null, checked.cost);
       } catch (e) {
@@ -113,6 +113,22 @@ async function makePage(ctx, index, ref, refKind, firstTry = null) {
 // pages later: a portrait cropped from the page where the check found the best likeness.
 // Cropping instead of drawing a separate character sheet keeps a book to exactly 20 image
 // calls, which fits in one minute of the account's image limit.
+async function portraitOk(ctx, data) {
+  const t0 = Date.now();
+  try {
+    const { result, cost } = await analyzeImage(
+      'This is a crop meant as a head-and-shoulders portrait of a cartoon child for a book\'s back cover. ' +
+        'Is one child\'s whole face (forehead, both eyes, nose, mouth and chin) inside the crop, not cut off by any edge? Return JSON {"face_ok": true/false}.',
+      [{ mime: 'image/jpeg', data }],
+    );
+    await logCall(ctx, 'hero', 'check', ANALYSIS_MODEL, Date.now() - t0, true, null, cost);
+    return result.face_ok !== false;
+  } catch (e) {
+    await logCall(ctx, 'hero', 'check', ANALYSIS_MODEL, Date.now() - t0, false, e.message, 0);
+    return true; // A failed check shouldn't leave the back cover empty.
+  }
+}
+
 async function saveHeroPortrait(ctx) {
   const story = STORIES[ctx.story];
   const { rows } = await query(
@@ -127,13 +143,15 @@ async function saveHeroPortrait(ctx) {
     if (!box) continue;
     const img = sharp(toBuffer(row.data));
     const { width: W, height: H } = await img.metadata();
-    // A head box grows into a head-and-shoulders portrait, 3:4.
-    const h = Math.min(1, box.h * 2.6) * H;
+    // The padded head box grows into a head-and-shoulders portrait, 3:4.
+    const head = padHead(box);
+    const h = Math.min(1, head.h * 2.2) * H;
     const w = Math.min(W, h * 0.75);
-    const cx = (box.x + box.w / 2) * W;
+    const cx = (head.x + head.w / 2) * W;
     const left = Math.round(Math.max(0, Math.min(W - w, cx - w / 2)));
-    const top = Math.round(Math.max(0, Math.min(H - h, box.y * H - box.h * H * 0.35)));
+    const top = Math.round(Math.max(0, Math.min(H - h, head.y * H - head.h * H * 0.15)));
     const data = await img.extract({ left, top, width: Math.round(w), height: Math.round(h) }).resize(600, 800, { fit: 'cover' }).jpeg({ quality: 88 }).toBuffer();
+    if (!(await portraitOk(ctx, data))) continue;
     await query(
       `INSERT INTO bible (story, key, book_id, description, mime, data) VALUES ($1, 'hero', $2, $3, 'image/jpeg', $4)
        ON CONFLICT (story, key, COALESCE(book_id, '00000000-0000-0000-0000-000000000000')) DO UPDATE SET data = $4, updated_at = now()`,

@@ -183,7 +183,7 @@ app.post('/api/books', handle(async (req) => {
   if (Number(scenes[0].n) < TEMPLATE.length) throw new HttpError(503, 'This story is still being prepared. Please try again later.');
   await checkBudget(req.user.id, TEMPLATE.length + 1);
   const { rows } = await query('INSERT INTO books (user_id, about, story, stage) VALUES ($1, $2, $3, $4) RETURNING id', [req.user.id, JSON.stringify(about), story.id, 'painting']);
-  const ctx = { bookId: rows[0].id, userId: req.user.id, story: story.id };
+  const ctx = { bookId: rows[0].id, userId: req.user.id, story: story.id, age: about.age };
   try {
     await wallet.charge(req.user.id, wallet.BOOK_PRICE_CENTS, 'book', `Book: ${story.title}, starring ${about.name}`, { bookId: ctx.bookId });
   } catch (e) {
@@ -232,7 +232,7 @@ async function pageAction(req, run) {
   if (isBusy(slots[slot])) throw new HttpError(409, 'That page is still being made.');
   await checkBudget(req.user.id, pipeline.MAX_TRIES);
   await pipeline.setSlot(book.id, slot, 'queued', { attempts: 0 });
-  const ctx = { bookId: book.id, userId: req.user.id, story: book.story };
+  const ctx = { bookId: book.id, userId: req.user.id, story: book.story, age: book.about?.age };
   run(ctx, slotIndex(slot)).catch((e) => log('error', { where: 'pageAction', book: book.id, error: e.message }));
   return { ok: true };
 }

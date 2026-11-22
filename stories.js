@@ -112,8 +112,16 @@ const IDENTITY =
   'Identity is the top priority: the face must be recognizably the person in the photo. Preserve face shape and width, ' +
   'eye shape, spacing and color, eyebrows, nose, mouth, ears, hairline, hairstyle, hair length, color and texture, skin tone, ' +
   'freckles and moles. Glasses, headbands, clips or bows only if the reference shows them: never add glasses or accessories that are not there. ' +
-  'Keep their apparent age and never make them look younger: a child stays a child of the same age with realistic proportions, ' +
-  'and an adult is drawn as an adult. Do not beautify or swap features.';
+  'Do not beautify or swap features.';
+
+// The hero is always the child's real age, the one the parent typed, on every page.
+const ageOf = (age) => {
+  const n = parseInt(age, 10);
+  return n >= 1 && n <= 17 ? `${n}-year-old` : 'young';
+};
+const AGE_RULE = (age) =>
+  `Draw them as a ${ageOf(age)} child on this page and every page: a child's face, head and body proportions, even if image 2 shows someone older. ` +
+  'Keep the identifying features (hair, skin tone, face shape, eye color), not the adult look.';
 
 // Character bible: one reference image per recurring character, made once and stored.
 export function bibleCastPrompt(story, key) {
@@ -170,14 +178,15 @@ export function scenePrompt(story, index) {
 // Per book: swap the stand-in for the real child. refs: [scene, reference of the child]
 // The reference is the uploaded photo while the book is first made, and the stored character
 // sheet for later re-makes (the photo itself is never stored).
-export function swapPrompt(story, ref = 'photo') {
+export function swapPrompt(story, ref = 'photo', age = '') {
   const what = ref === 'photo' ? 'a photo of the child' : 'a portrait of the child, from this book';
   return [
     STYLE,
     `Image 1 is a finished page from "${story.title}". Image 2 is ${what} who is ${story.hero} in this book.`,
-    `Replace ${story.hero} in image 1 with the child from image 2: their face, hair, skin tone, age and build, drawn in the same style as the rest of image 1. Add nothing to the face that image 2 does not show. ` +
+    `Replace ${story.hero} in image 1 with the child from image 2: their face, hair and skin tone, drawn in the same style as the rest of image 1. Add nothing to the face that image 2 does not show. ` +
       `Keep ${story.hero}'s outfit (${story.outfit}), pose, size, position and expression from image 1.`,
     IDENTITY,
+    AGE_RULE(age),
     'Change nothing else: every other character, the background, the camera, the lighting and the colors stay exactly as in image 1.',
     NO_TEXT,
   ].join('\n\n');
@@ -195,7 +204,7 @@ export function editPrompt(story, instruction) {
 }
 
 // Vision check of a finished page. refs: [page, reference of the child]
-export function analysisPrompt(story, index, ref = 'photo') {
+export function analysisPrompt(story, index, ref = 'photo', age = '') {
   const page = story.pages[index];
   const what = ref === 'photo' ? 'a real photo of the child' : 'a portrait of the child, from this book';
   const others = page.cast.map((key) => story.cast[key].split(':')[0]).join(', ') || 'nobody else';
@@ -206,7 +215,7 @@ Other characters who should appear: ${others}.
 
 How to judge likeness: the page is a stylized 3D cartoon, so the hero is drawn as a cartoon child with big eyes even if image 2 shows an adult. That is expected. Judge only whether the features that identify the person carried over: hair color, hair length and style, skin tone, face shape, glasses or accessories. 8-10: clearly the same person as a cartoon. 5-7: some identifying features carried over. 0-4: looks like a different person.
 
-Defects are only serious problems a parent would notice: letters or words drawn in the picture, extra or missing arms, legs or fingers, a melted or distorted face, the hero shown twice, the hero missing or facing away, or a named character missing. Small differences from the scene description are not defects; reflect them in scene_match instead.
+Defects are only serious problems a parent would notice: letters or words drawn in the picture, extra or missing arms, legs or fingers, a melted or distorted face, the hero shown twice, the hero missing or facing away, a named character missing, or the hero looking like an adult or teenager instead of a ${ageOf(age)} child. Small differences from the scene description are not defects; reflect them in scene_match instead.
 
 Return JSON:
 {

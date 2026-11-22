@@ -16,7 +16,17 @@ const MARGIN = 0.05;
 // Art fractions -> fractions of an area of width w and height h that the art fills by cropping.
 export function mapBoxes(important = [], w = PAGE_W, h = PAGE_H) {
   const crop = Math.max(0, (1 - (w / h) / ART_ASPECT) / 2); // fraction of the art cut off each side
-  return important.map((b) => ({ label: b.label, x: (b.x - crop) / (1 - 2 * crop), y: b.y, w: b.w / (1 - 2 * crop), h: b.h }));
+  return important.map((raw) => {
+    const b = /head|face/i.test(raw.label || '') ? padHead(raw) : raw;
+    return { label: b.label, x: (b.x - crop) / (1 - 2 * crop), y: b.y, w: b.w / (1 - 2 * crop), h: b.h };
+  });
+}
+
+// The vision model's head boxes often stop at the forehead or sit a little low.
+export function padHead(b) {
+  const up = b.h * 0.45;
+  const side = b.w * 0.15;
+  return { ...b, x: b.x - side, y: b.y - up, w: b.w + 2 * side, h: b.h + up + b.h * 0.1 };
 }
 
 export const clearOf = (boxes, y0, y1) => !boxes.some((b) => b.y < y1 + MARGIN && b.y + b.h > y0 - MARGIN && b.x < 1 && b.x + b.w > 0);
