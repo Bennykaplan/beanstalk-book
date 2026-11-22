@@ -3,7 +3,7 @@
 // Every page is 11.25 x 8.75 in: an 11 x 8.5 in landscape book with 0.125 in bleed.
 import PDFDocument from 'pdfkit';
 import { createRequire } from 'node:module';
-import { PAGE_W, PAGE_H, SAFE, textBandHeight } from './layout.js';
+import { PAGE_W, PAGE_H, SAFE, textBandHeight, coverTitle } from './layout.js';
 
 const require = createRequire(import.meta.url);
 const FONT = require.resolve('@fontsource/fredoka/files/fredoka-latin-600-normal.woff');
@@ -97,15 +97,24 @@ function blank(doc) {
 // The front cover: the cover picture, with the title where it covers nothing important.
 function frontCover(doc, book, x, w, h, safe) {
   const page = book.pages[book.coverIndex];
-  art(doc, page.image, x, 0, w, h);
-  const zone = page.layout?.mode === 'band' && page.layout.zone === 'bottom' ? 'bottom' : 'top';
-  const blockH = 150;
-  const y0 = zone === 'top' ? safe : h - safe - blockH;
-  const grad = doc.linearGradient(0, y0 - 40, 0, y0 + blockH + 40);
-  grad.stop(0, '#000', zone === 'top' ? 0.65 : 0).stop(1, '#000', zone === 'top' ? 0 : 0.65);
-  doc.save().rect(x, Math.max(0, y0 - 40), w, blockH + 80).fill(grad).restore();
+  const blockH = 120;
   const opts = { width: w - 2 * safe - 40, align: 'center' };
-  doc.font(FONT).fontSize(44).fillColor('#fff').text(book.title, x + safe + 20, y0 + 10, opts);
+  // No boxes means the page was never checked: take the strip, which can't cover anything.
+  const place = page.important ? coverTitle(page.important, w, h, blockH, safe) : { mode: 'strip' };
+  if (place.mode === 'strip') {
+    const stripH = safe + blockH + 20;
+    doc.rect(x, 0, w, stripH).fill(CREAM);
+    art(doc, page.image, x, stripH, w, h - stripH);
+    doc.font(FONT).fontSize(44).fillColor(INK).text(book.title, x + safe + 20, safe + 6, opts);
+    doc.font(FONT).fontSize(24).fillColor(GREEN).text(`starring ${book.name}`, x + safe + 20, doc.y + 4, opts);
+    return;
+  }
+  art(doc, page.image, x, 0, w, h);
+  const top = place.zone === 'top';
+  const grad = doc.linearGradient(0, place.y0 - 40, 0, place.y0 + blockH + 40);
+  grad.stop(0, '#000', top ? 0.65 : 0).stop(1, '#000', top ? 0 : 0.65);
+  doc.save().rect(x, Math.max(0, place.y0 - 40), w, blockH + 80).fill(grad).restore();
+  doc.font(FONT).fontSize(44).fillColor('#fff').text(book.title, x + safe + 20, place.y0 + 6, opts);
   doc.font(FONT).fontSize(24).fillColor('#ffe7a3').text(`starring ${book.name}`, x + safe + 20, doc.y + 4, opts);
 }
 

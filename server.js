@@ -296,14 +296,17 @@ app.get('/api/books/:id/thumbs/:slot', sendImage('thumb'));
 async function bookForPrint(bookRow) {
   const story = STORIES[bookRow.story];
   if (!story) throw new HttpError(409, 'This early draft can’t be made into a PDF.');
-  const { rows } = await query('SELECT slot, data, layout FROM images WHERE book_id = $1 AND data IS NOT NULL', [bookRow.id]);
+  const { rows } = await query('SELECT slot, data, layout, analysis FROM images WHERE book_id = $1 AND data IS NOT NULL', [bookRow.id]);
   const bySlot = Object.fromEntries(rows.map((r) => [r.slot, r]));
   if (!PAGE_SLOTS.every((s) => bySlot[s])) throw new HttpError(409, 'Every page needs its picture before the PDF can be made.');
   const hero = await pipeline.loadBibleHero(bookRow.id);
   return {
     id: bookRow.id, title: story.title, hero_name: story.hero, name: bookRow.about.name, about: bookRow.about,
     createdAt: bookRow.created_at, coverIndex: story.cover, hero: hero?.data,
-    pages: story.pages.map((p, i) => ({ text: p.text, image: toBuffer(bySlot[pageSlot(i)].data), layout: bySlot[pageSlot(i)].layout })),
+    pages: story.pages.map((p, i) => {
+      const row = bySlot[pageSlot(i)];
+      return { text: p.text, image: toBuffer(row.data), layout: row.layout, important: row.analysis?.important };
+    }),
   };
 }
 

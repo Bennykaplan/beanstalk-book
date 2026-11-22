@@ -175,7 +175,7 @@ export function swapPrompt(story, ref = 'photo') {
   return [
     STYLE,
     `Image 1 is a finished page from "${story.title}". Image 2 is ${what} who is ${story.hero} in this book.`,
-    `Replace ${story.hero} in image 1 with the child from image 2: their face, hair, skin tone, glasses and accessories, age and build, drawn in the same style as the rest of image 1. ` +
+    `Replace ${story.hero} in image 1 with the child from image 2: their face, hair, skin tone, age and build, drawn in the same style as the rest of image 1. Add nothing to the face that image 2 does not show. ` +
       `Keep ${story.hero}'s outfit (${story.outfit}), pose, size, position and expression from image 1.`,
     IDENTITY,
     'Change nothing else: every other character, the background, the camera, the lighting and the colors stay exactly as in image 1.',
@@ -216,5 +216,5 @@ Return JSON:
   "defects": ["..."],
   "important": [{"label": "...", "x": 0-1, "y": 0-1, "w": 0-1, "h": 0-1}]
 }
-"important" lists the bounding box (fractions of image width and height, x/y = top-left corner) of every face, every character's head, and every object the words depend on. Words will be printed on the page and must never cover anything in this list.`;
+"important" lists the bounding box (fractions of image width and height, x/y = top-left corner) of every character's whole head (hair, ears, hats and hood included; label it "<name> head"), and every object the words depend on. Words will be printed on the page and must never cover anything in this list.`;
 }

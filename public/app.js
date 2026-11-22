@@ -186,7 +186,7 @@ function triesBadge(s, max) {
 
 function tileState(s) {
   if (!s) return 'Waiting';
-  return { queued: 'Waiting', painting: 'Painting…', checking: 'Checking…', retrying: 'Redoing…', error: 'Failed' }[s.status] || '';
+  return { queued: 'Waiting', painting: 'Painting…', checking: 'Checking…', retrying: 'Redoing…', error: 'Failed: click to try again' }[s.status] || '';
 }
 
 async function bookView(id) {
@@ -329,7 +329,23 @@ function openPage(book, slot, after) {
   const s = book.slots[slot];
   const p = book.pages.find((x) => x.slot === slot);
   const dlg = $('#viewer');
-  if (!s?.hasImage) return;
+  if (s && BUSY.includes(s.status)) return;
+  if (!s?.hasImage) {
+    dlg.innerHTML = `
+      <div class="viewer stack">
+        <div class="actions" style="justify-content:space-between"><h2 style="margin:0">Page ${p.number} didn't work</h2><button class="quiet" id="close">Close</button></div>
+        <div class="notice err">${esc(s?.error || 'This page could not be made.')}</div>
+        <p class="muted">Try again: it usually works the second time. It doesn't cost you anything extra.</p>
+        <div class="actions"><button id="retry">Try again</button></div>
+        <div class="small" id="pageErr" style="color:var(--err)"></div>
+      </div>`;
+    $('#close').onclick = () => dlg.close();
+    $('#retry').onclick = async () => {
+      try { await api(`/api/books/${book.id}/slots/${slot}/remake`, 'POST', {}); dlg.close(); after(); } catch (e) { $('#pageErr').textContent = e.message; }
+    };
+    dlg.showModal();
+    return;
+  }
   const check = s.passed === true ? 'Passed the picture check' : s.passed === false ? `None of ${s.attempts} tries passed the check; the best is kept` : 'Not checked';
   dlg.innerHTML = `
     <div class="viewer stack">
@@ -502,8 +518,16 @@ async function route() {
 }
 
 async function boot() {
-  [state.stories] = await Promise.all([fetch('/api/stories').then((r) => r.json()), refreshMe()]);
-  route();
+  for (let i = 0; ; i++) {
+    try {
+      [state.stories] = await Promise.all([fetch('/api/stories').then((r) => { if (!r.ok) throw new Error(); return r.json(); }), refreshMe()]);
+      return route();
+    } catch {
+      if (i === 30) { view.innerHTML = '<div class="notice err">The site isn’t responding. Please reload the page in a minute.</div>'; return; }
+      view.innerHTML = '<div class="card stack"><h2>Waking up the server…</h2><p class="muted">The site sleeps when nobody has used it for a while. This takes up to a minute.</p></div>';
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+    }
+  }
 }
 
 window.addEventListener('hashchange', route);

@@ -124,7 +124,9 @@ export async function costStats() {
   const { rows } = await query(
     `SELECT count(*) AS books, COALESCE(avg(total), 0) AS avg, COALESCE(min(total), 0) AS min, COALESCE(max(total), 0) AS max FROM (
        SELECT b.id, sum(g.cost_usd) AS total FROM books b JOIN generation_log g ON g.book_id = b.id
-       WHERE b.stage = 'ready' AND b.story IS NOT NULL GROUP BY b.id
+       WHERE b.story IS NOT NULL
+         AND (SELECT count(*) FROM images i WHERE i.book_id = b.id AND i.slot LIKE 'p%' AND i.data IS NOT NULL) = 20
+       GROUP BY b.id
      ) t`,
   );
   const r = rows[0];

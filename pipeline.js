@@ -77,7 +77,7 @@ async function makePage(ctx, index, ref, refKind, firstTry = null) {
       } catch (e) {
         await logCall(ctx, slot, 'image:page', MODEL, Date.now() - t0, false, e.message, 0);
         // Retrying can't fix a billing or key problem; it can only fail again.
-        if (/credits|quota|billing|api key|safety system/i.test(e.message)) throw e;
+        if (/credits|quota|billing|api key/i.test(e.message)) throw e;
         continue;
       }
       await setSlot(ctx.bookId, slot, 'checking', { attempts: n });
@@ -122,7 +122,8 @@ async function saveHeroPortrait(ctx) {
   const heroWords = new RegExp(`hero|child|${story.hero.split(' ').pop()}|kid|girl|boy|face`, 'i');
   for (const row of rows) {
     const boxes = (row.analysis?.important || []).filter((b) => b.w > 0.04 && b.h > 0.06);
-    const box = boxes.find((b) => heroWords.test(b.label || '')) || boxes.sort((p, q) => q.w * q.h - p.w * p.h)[0];
+    const isHead = (b) => /face|head/i.test(b.label || '');
+    const box = boxes.find((b) => isHead(b) && heroWords.test(b.label || '')) || boxes.find(isHead);
     if (!box) continue;
     const img = sharp(toBuffer(row.data));
     const { width: W, height: H } = await img.metadata();
